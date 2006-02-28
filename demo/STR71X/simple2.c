@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * File: $Id: simple2.c,v 1.5 2006/02/25 18:34:08 wolti Exp $
+ * File: $Id: simple2.c,v 1.6 2006/02/28 22:12:00 wolti Exp $
  */
 
 /* ----------------------- System includes ----------------------------------*/
@@ -38,8 +38,8 @@
 #define REG_INPUT_NREGS 4
 
 /* ----------------------- Static variables ---------------------------------*/
-static unsigned portSHORT usRegInputStart = REG_INPUT_START;
-static unsigned portSHORT usRegInputBuf[REG_INPUT_NREGS];
+static unsigned short usRegInputStart = REG_INPUT_START;
+static unsigned short usRegInputBuf[REG_INPUT_NREGS];
 
 /* ----------------------- Static functions ---------------------------------*/
 static void     vModbusTask( void *pvParameters );
@@ -64,14 +64,14 @@ vModbusTask( void *pvParameters )
     portTickType    xLastWakeTime;
 
     /* Select either ASCII or RTU Mode. */
-    eMBInit( MB_RTU, 0x0A, 38400, MB_PAR_EVEN );
+    ( void )eMBInit( MB_RTU, 0x0A, 38400, MB_PAR_EVEN );
 
     /* Enable the Modbus Protocol Stack. */
-    eMBEnable(  );
+    ( void )eMBEnable(  );
     for( ;; )
     {
         /* Call the main polling loop of the Modbus protocol stack. */
-        eMBPool(  );
+        ( void )eMBPool(  );
         /* Application specific actions. Count the number of poll cycles. */
         usRegInputBuf[0]++;
         /* Hold the current FreeRTOS ticks. */
@@ -92,11 +92,13 @@ eMBRegInputCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs )
     if( ( usAddress >= REG_INPUT_START )
         && ( usAddress + usNRegs <= REG_INPUT_START + REG_INPUT_NREGS ) )
     {
-        iRegIndex = usAddress - usRegInputStart;
+        iRegIndex = ( int )( usAddress - usRegInputStart );
         while( usNRegs > 0 )
         {
-            *pucRegBuffer++ = usRegInputBuf[iRegIndex] >> 8;
-            *pucRegBuffer++ = usRegInputBuf[iRegIndex] & 0xFF;
+            *pucRegBuffer++ =
+                ( unsigned char )( usRegInputBuf[iRegIndex] >> 8 );
+            *pucRegBuffer++ =
+                ( unsigned char )( usRegInputBuf[iRegIndex] & 0xFF );
             iRegIndex++;
             usNRegs--;
         }
@@ -134,5 +136,5 @@ void
 __assert( const char *pcFile, const char *pcLine, int iLineNumber )
 {
     portENTER_CRITICAL(  );
-    while( 1 );
+    for( ;; );
 }

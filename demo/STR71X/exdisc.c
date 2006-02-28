@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * File: $Id: excoils.c,v 1.4 2006/02/28 22:12:00 wolti Exp $
+ * File: $Id: exdisc.c,v 1.1 2006/02/28 22:12:14 wolti Exp $
  */
 
 /* ----------------------- System includes ----------------------------------*/
@@ -35,11 +35,11 @@
 #include "mbutils.h"
 
 /* ----------------------- Defines ------------------------------------------*/
-#define REG_COILS_START     1000
-#define REG_COILS_SIZE      16
+#define REG_DISC_START     1000
+#define REG_DISC_SIZE      16
 
 /* ----------------------- Static variables ---------------------------------*/
-static unsigned char ucRegCoilsBuf[REG_COILS_SIZE / 8];
+static unsigned char ucRegDiscBuf[REG_DISC_SIZE / 8] = { 0, 0 };
 
 /* ----------------------- Static functions ---------------------------------*/
 static void     vModbusTask( void *pvParameters );
@@ -62,12 +62,14 @@ static void
 vModbusTask( void *pvParameters )
 {
     /* Select either ASCII or RTU Mode. */
-    ( void )eMBInit( MB_RTU, ( unsigned char )0x0A, 38400, MB_PAR_EVEN );
+    ( void )eMBInit( MB_RTU, 0x0A, 38400, MB_PAR_EVEN );
+
+    /* Initialise the discrete input registers. */
+    xMBUtilSetBits( ucRegDiscBuf, 2, 2, 3 );    /* Set bit 2:3 to 11b. */
+    xMBUtilSetBits( ucRegDiscBuf, 8, 1, 1 );    /* Set bit 8 to 1b. */
 
     /* Enable the Modbus Protocol Stack. */
     ( void )eMBEnable(  );
-
-    /* Enter main loop. */
     for( ;; )
     {
         /* Call the main polling loop of the Modbus protocol stack. */
@@ -76,52 +78,39 @@ vModbusTask( void *pvParameters )
 }
 
 eMBErrorCode
-eMBRegCoilsCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNCoils,
-               eMBRegisterMode eMode )
+eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNDiscrete )
 {
     eMBErrorCode    eStatus = MB_ENOERR;
-    int             iNCoils = ( int )usNCoils;
+    short           iNDiscrete = ( short )usNDiscrete;
     unsigned short  usBitOffset;
 
     /* Check if we have registers mapped at this block. */
-    if( ( usAddress >= REG_COILS_START ) &&
-        ( usAddress + usNCoils <= REG_COILS_START + REG_COILS_SIZE ) )
+    if( ( usAddress >= REG_DISC_START ) &&
+        ( usAddress + usNDiscrete <= REG_DISC_START + REG_DISC_SIZE ) )
     {
-        usBitOffset = ( unsigned short )( usAddress - REG_COILS_START );
-        switch ( eMode )
+        usBitOffset = ( unsigned short )( usAddress - REG_DISC_START );
+        while( iNDiscrete > 0 )
         {
-                /* Read current values and pass to protocol stack. */
-            case MB_REG_READ:
-                while( iNCoils > 0 )
-                {
-                    *pucRegBuffer++ =
-                        xMBUtilGetBits( ucRegCoilsBuf, usBitOffset,
-                                        ( unsigned char )( iNCoils >
-                                                           8 ? 8 :
-                                                           iNCoils ) );
-                    iNCoils -= 8;
-                    usBitOffset += 8;
-                }
-                break;
-
-                /* Update current register values. */
-            case MB_REG_WRITE:
-                while( iNCoils > 0 )
-                {
-                    xMBUtilSetBits( ucRegCoilsBuf, usBitOffset, iNCoils % 8,
-                                    *pucRegBuffer++ );
-                    iNCoils -= 8;
-                    usBitOffset += 8;
-                }
-                break;
+            *pucRegBuffer++ =
+                xMBUtilGetBits( ucRegDiscBuf, usBitOffset,
+                                ( unsigned char )( iNDiscrete >
+                                                   8 ? 8 : iNDiscrete ) );
+            iNDiscrete -= 8;
+            usBitOffset += 8;
         }
-
     }
     else
     {
         eStatus = MB_ENOREG;
     }
     return eStatus;
+}
+
+eMBErrorCode
+eMBRegCoilsCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNCoils,
+               eMBRegisterMode eMode )
+{
+    return MB_ENOREG;
 }
 
 
@@ -138,15 +127,9 @@ eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,
     return MB_ENOREG;
 }
 
-eMBErrorCode
-eMBRegDiscreteCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNDiscrete )
-{
-    return MB_ENOREG;
-}
-
 void
 __assert( const char *pcFile, const char *pcLine, int iLineNumber )
 {
     portENTER_CRITICAL(  );
-    for( ;; );
+    while( 1 );
 }

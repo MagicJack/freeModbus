@@ -1,5 +1,15 @@
 
 2006-02-28 Christian Walter <wolti@sil.at>
+ Notes: This version includes support for two new command 
+   (write multiple coils, read discrete input)
+
+ Detailed notes:
+  - BUG: some function used the wrong datatypes
+  - FEATURES: added support for write multiple coils function.
+  - FEATURES: added support for read discrete input.
+  - OTHER: some code cleanups with lint tool.
+
+2006-02-28 Christian Walter <wolti@sil.at>
 
  Notes: The new version 0.31 adds support for reading and writing the
    coil registers and add some bugfixes.
