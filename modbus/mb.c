@@ -16,7 +16,7 @@
   * License along with this library; if not, write to the Free Software
   * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   *
-  * File: $Id: mb.c,v 1.8 2006/02/28 22:38:21 wolti Exp $
+  * File: $Id: mb.c,v 1.9 2006/05/01 11:16:19 wolti Exp $
   */
 
 /* ----------------------- System includes ----------------------------------*/
@@ -50,8 +50,7 @@ static peMBFrameInit peMBFrameInitCur;
 
 BOOL( *pxMBFrameCBByteReceived ) ( void );
 BOOL( *pxMBFrameCBTransmitterEmpty ) ( void );
-BOOL( *pxMBPortCBTimer1Expired ) ( void );
-BOOL( *pxMBPortCBTimer2Expired ) ( void );
+BOOL( *pxMBPortCBTimerExpired ) ( void );
 
 BOOL( *pxMBFrameCBReceiveFSMCur ) ( void );
 BOOL( *pxMBFrameCBTransmitFSMCur ) ( void );
@@ -114,8 +113,7 @@ eMBInit( eMBMode eMode, UCHAR ucSlaveAddress, ULONG ulBaudRate,
 
             pxMBFrameCBByteReceived = xMBRTUReceiveFSM;
             pxMBFrameCBTransmitterEmpty = xMBRTUTransmitFSM;
-            pxMBPortCBTimer1Expired = xMBRTUTimerT15Expired;
-            pxMBPortCBTimer2Expired = xMBRTUTimerT35Expired;
+            pxMBPortCBTimerExpired = xMBRTUTimerT35Expired;
             break;
         case MB_ASCII:
 #if MB_ASCII_ENABLED > 0
@@ -126,8 +124,7 @@ eMBInit( eMBMode eMode, UCHAR ucSlaveAddress, ULONG ulBaudRate,
 
             pxMBFrameCBByteReceived = xMBASCIIReceiveFSM;
             pxMBFrameCBTransmitterEmpty = xMBASCIITransmitFSM;
-            pxMBPortCBTimer1Expired = xMBASCIITimerT1SExpired;
-            pxMBPortCBTimer2Expired = NULL;
+            pxMBPortCBTimerExpired = xMBASCIITimerT1SExpired;
 #else
             assert( eMode != MB_ASCII );
 #endif
@@ -162,7 +159,7 @@ eMBEnable( void )
 }
 
 eMBErrorCode
-eMBPool(  )
+eMBPoll(  )
 {
     static UCHAR    ucRcvAddress;
     static UCHAR    ucFunctionCode;
