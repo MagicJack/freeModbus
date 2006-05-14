@@ -1,5 +1,5 @@
  /*
-  * FreeRTOS Modbus Libary: A Modbus serial implementation for FreeRTOS
+  * FreeModbus Libary: A portable Modbus implementation for Modbus ASCII/RTU.
   * Copyright (C) 2006 Christian Walter <wolti@sil.at>
   *
   * This library is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@
   * License along with this library; if not, write to the Free Software
   * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   *
-  * File: $Id: mb.c,v 1.9 2006/05/01 11:16:19 wolti Exp $
+  * File: $Id: mb.c,v 1.10 2006/05/13 12:38:08 wolti Exp $
   */
 
 /* ----------------------- System includes ----------------------------------*/
@@ -75,7 +75,7 @@ static xMBFunctionHandler xFuncHandlers[MB_FUNC_HANDLERS_MAX] = {
     {MB_FUNC_READ_COILS, eMBFuncReadCoils},
 #endif
 #if MB_FUNC_WRITE_COIL_ENABLED > 0
-    {MB_FUNC_WRITE_SINGLE_COIL, eMBFuncWriteCoil}, 
+    {MB_FUNC_WRITE_SINGLE_COIL, eMBFuncWriteCoil},
 #endif
 #if MB_FUNC_WRITE_MULTIPLE_COILS_ENABLED > 0
     {MB_FUNC_WRITE_MULTIPLE_COILS, eMBFuncWriteMultipleCoils},
@@ -215,7 +215,7 @@ eMBPoll(  )
                     }
                 }
 
-                /* If the request was not sent to the broadcast address we 
+                /* If the request was not sent to the broadcast address we
                  * return a reply. */
                 if( ucRcvAddress != MB_ADDRESS_BROADCAST )
                 {

@@ -1,5 +1,5 @@
  /*
-  * FreeRTOS Modbus Libary: A Modbus serial implementation for FreeRTOS
+  * FreeModbus Libary: A portable Modbus implementation for Modbus ASCII/RTU.
   * Copyright (C) 2006 Christian Walter <wolti@sil.at>
   *
   * This library is free software; you can redistribute it and/or
@@ -16,13 +16,13 @@
   * License along with this library; if not, write to the Free Software
   * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   *
-  * File: $Id: mbframe.h,v 1.3 2006/02/25 18:38:03 wolti Exp $
+  * File: $Id: mbframe.h,v 1.4 2006/05/13 12:34:32 wolti Exp $
   */
 
 #ifndef _MB_FRAME_H
 #define _MB_FRAME_H
 
-/*! 
+/*!
  * Constants which defines the format of a modbus frame.
  *
  * <code>
@@ -33,7 +33,7 @@
  *  +-----------+---------------+----------------------------+-------------+
  *  |           |               |                                   |
  * (2)        (3/2')           (3')                                (4)
- * 
+ *
  * (1)  ... MB_SER_PDU_SIZE_MAX = 256
  * (2)  ... MB_SER_PDU_ADDR_OFF = 0
  * (3)  ... MB_SER_PDU_PDU_OFF  = 1

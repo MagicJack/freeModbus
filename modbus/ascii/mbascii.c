@@ -1,5 +1,5 @@
  /*
-  * FreeRTOS Modbus Libary: A Modbus serial implementation for FreeRTOS
+  * FreeModbus Libary: A portable Modbus implementation for Modbus ASCII/RTU.
   * Copyright (C) 2006 Christian Walter <wolti@sil.at>
   *
   * This library is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@
   * License along with this library; if not, write to the Free Software
   * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   *
-  * File: $Id: mbascii.c,v 1.7 2006/05/01 11:17:29 wolti Exp $
+  * File: $Id: mbascii.c,v 1.8 2006/05/13 12:38:08 wolti Exp $
   */
 
 /* ----------------------- System includes ----------------------------------*/
@@ -144,7 +144,7 @@ eMBASCIIReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame,
         && ( prvucMBLRC( ( UCHAR * ) ucASCIIBuf, usRcvBufferPos ) == 0 ) )
     {
         /* Save the address field. All frames are passed to the upper layed
-         * and the decision if a frame is used is done there. 
+         * and the decision if a frame is used is done there.
          */
         *pucRcvAddress = ucASCIIBuf[MB_SER_PDU_ADDR_OFF];
 
@@ -216,7 +216,7 @@ xMBASCIIReceiveFSM( void )
     {
             /* A new character is received. If the character is a ':' the input
              * buffer is cleared. A CR-character signals the end of the data
-             * block. Other characters are part of the data block and their 
+             * block. Other characters are part of the data block and their
              * ASCII value is converted back to a binary representation.
              */
         case STATE_RX_RCV:
@@ -248,7 +248,7 @@ xMBASCIIReceiveFSM( void )
                         }
                         else
                         {
-                            /* not handled in Modbus specification but seems 
+                            /* not handled in Modbus specification but seems
                              * a resonable implementation. */
                             eRcvState = STATE_RX_IDLE;
                             /* Disable previously activated timer because of error state. */
@@ -396,7 +396,7 @@ xMBASCIITimerT1SExpired( void )
     switch ( eRcvState )
     {
             /* If we have a timeout we go back to the idle state and wait for
-             * the next frame. 
+             * the next frame.
              */
         case STATE_RX_RCV:
         case STATE_RX_WAIT_EOF:

@@ -1,5 +1,5 @@
  /*
-  * FreeRTOS Modbus Libary: A Modbus serial implementation for FreeRTOS
+  * FreeModbus Libary: A portable Modbus implementation for Modbus ASCII/RTU.
   * Copyright (C) 2006 Christian Walter <wolti@sil.at>
   *
   * This library is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@
   * License along with this library; if not, write to the Free Software
   * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   *
-  * File: $Id: mbport.h,v 1.7 2006/05/01 11:18:08 wolti Exp $
+  * File: $Id: mbport.h,v 1.8 2006/05/13 12:34:32 wolti Exp $
   */
 
 #ifndef _MB_PORT_H
@@ -34,9 +34,9 @@ typedef enum
 
 /*! \ingroup modbus
  * \brief Parity used for characters in serial mode.
- * 
+ *
  * The parity which should be applied to the characters sent over the serial
- * link. Please note that this values are actually passed to the porting 
+ * link. Please note that this values are actually passed to the porting
  * layer and therefore not all parity modes might be available.
  */
 typedef enum
@@ -80,7 +80,7 @@ inline void     vMBPortTimersDisable( void );
  * Depending upon the mode this callback function is used by the RTU or
  * ASCII transmission layers. In any case a call to xMBPortSerialGetByte()
  * must immediately return a new character.
- * 
+ *
  * \return <code>TRUE</code> if a event was posted to the queue because
  *   a new byte was received. The port implementation should wake up the
  *   tasks which are currently blocked on the eventqueue.

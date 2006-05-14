@@ -1,4 +1,12 @@
 
+2006-05-14 Christian Walter <wolti@sil.at>
+ Notes: The new version includes a new port for the
+   Freescale MCF5235 processor.
+
+ Detailed notes:
+   - FEATURES: added new MCF5235 port.
+   - OTHER: fixed some missing code headers.
+
 2006-02-28 Christian Walter <wolti@sil.at>
  Notes: This version includes support for two new command 
    (write multiple coils, read discrete input)

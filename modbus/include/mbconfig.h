@@ -1,5 +1,5 @@
  /*
-  * FreeRTOS Modbus Libary: A Modbus serial implementation for FreeRTOS
+  * FreeModbus Libary: A portable Modbus implementation for Modbus ASCII/RTU.
   * Copyright (C) 2006 Christian Walter <wolti@sil.at>
   *
   * This library is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@
   * License along with this library; if not, write to the Free Software
   * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   *
-  * File: $Id: mbconfig.h,v 1.7 2006/02/28 22:41:37 wolti Exp $
+  * File: $Id: mbconfig.h,v 1.8 2006/05/13 12:38:08 wolti Exp $
   */
 
 #ifndef _MB_CONFIG_H
@@ -39,7 +39,7 @@
 
 /*! \brief If Modbus ASCII support is required. */
 #define MB_ASCII_ENABLED                        (  1 )
-/*! \brief The character timeout value for Modbus ASCII. 
+/*! \brief The character timeout value for Modbus ASCII.
  *
  * The character timeout value is not fixed for Modbus ASCII and is therefore
  * a configuration option. It should be set to the maximum expected delay
@@ -51,7 +51,7 @@
  *    should support.
  *
  * The maximum number of supported Modbus functions must be greater than
- * the sum of all enabled functions in this file and custom function 
+ * the sum of all enabled functions in this file and custom function
  * handlers. If set to small adding more functions will fail.
  */
 #define MB_FUNC_HANDLERS_MAX                    ( 16 )

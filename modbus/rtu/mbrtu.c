@@ -1,5 +1,5 @@
  /*
-  * FreeRTOS Modbus Libary: A Modbus serial implementation for FreeRTOS
+  * FreeModbus Libary: A portable Modbus implementation for Modbus ASCII/RTU.
   * Copyright (C) 2006 Christian Walter <wolti@sil.at>
   *
   * This library is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@
   * License along with this library; if not, write to the Free Software
   * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   *
-  * File: $Id: mbrtu.c,v 1.6 2006/05/01 11:18:00 wolti Exp $
+  * File: $Id: mbrtu.c,v 1.7 2006/05/13 12:38:08 wolti Exp $
   */
 
 /* ----------------------- System includes ----------------------------------*/
@@ -77,7 +77,7 @@ eMBRTUInit( UCHAR ucSlaveAddress, ULONG ulBaudRate, eMBParity eParity )
     ENTER_CRITICAL_SECTION(  );
 
     /* If baudrate > 19200 then we should use the fixed timer values
-     * t35 = 1750us. Otherwise t35 must be 3.5 times the character time. 
+     * t35 = 1750us. Otherwise t35 must be 3.5 times the character time.
      */
     if( ulBaudRate > 19200 )
     {
@@ -142,7 +142,7 @@ eMBRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
         && ( usMBCRC16( ( UCHAR * ) ucRTUBuf, usRcvBufferPos ) == 0 ) )
     {
         /* Save the address field. All frames are passed to the upper layed
-         * and the decision if a frame is used is done there. 
+         * and the decision if a frame is used is done there.
          */
         *pucRcvAddress = ucRTUBuf[MB_SER_PDU_ADDR_OFF];
 
@@ -221,7 +221,7 @@ xMBRTUReceiveFSM( void )
             vMBPortTimersEnable(  );
             break;
 
-        /* In the error state we wait until all characters in the 
+        /* In the error state we wait until all characters in the
          * damaged frame are transmitted.
          */
         case STATE_RX_ERROR:
@@ -243,7 +243,7 @@ xMBRTUReceiveFSM( void )
 
         /* We are currently receiving a frame. Reset the timer after
          * every character received. If more than the maximum possible
-         * number of bytes in a modbus frame is received the frame is 
+         * number of bytes in a modbus frame is received the frame is
          * ignored.
          */
         case STATE_RX_RCV:
