@@ -1,5 +1,5 @@
 /*
- * FreeModbus Libary: STR71x Port
+ * FreeModbus Libary: Win32 Port
  * Copyright (C) 2006 Christian Walter <wolti@sil.at>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,45 +16,47 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * File: $Id: port.h,v 1.6 2006/06/15 15:27:16 wolti Exp $
+ * File: $Id: port.h,v 1.1 2006/06/16 00:13:39 wolti Exp $
  */
 
 #ifndef _PORT_H
 #define _PORT_H
 
-#include "assert.h"
-#include "FreeRTOS.h"
+#include <windows.h>
+#include <tchar.h>
+#include <assert.h>
 
-/* work aroung a problem when inline is also defined in 71x_conf.h */
-#ifdef INLINE
-#undef INLINE  
+#define	INLINE
+#define PR_BEGIN_EXTERN_C			extern "C" {
+#define	PR_END_EXTERN_C				}
+
+#ifdef __cplusplus
+PR_BEGIN_EXTERN_C
 #endif
-
-#define INLINE                      inline
-
-#define PR_BEGIN_EXTERN_C           extern "C" {
-#define	PR_END_EXTERN_C             }
-
-#define ENTER_CRITICAL_SECTION( )   portENTER_CRITICAL( )
-#define EXIT_CRITICAL_SECTION( )    portEXIT_CRITICAL( )
-
-typedef char    BOOL;
-
-typedef unsigned char UCHAR;
-typedef char    CHAR;
-
-typedef unsigned short USHORT;
-typedef short   SHORT;
-
-typedef unsigned long ULONG;
-typedef long    LONG;
-
+#define ENTER_CRITICAL_SECTION( )
+#define EXIT_CRITICAL_SECTION( )
 #ifndef TRUE
 #define TRUE            1
 #endif
-
 #ifndef FALSE
 #define FALSE           0
 #endif
+#ifdef _DEBUG
+void            TRACEC( const TCHAR * pcFmt, ... );
+void            ERRORC( const TCHAR * pcFmt, DWORD dwError, ... );
+#else
+#define TRACEC( pcFmt, ... )
+#define ERRORC( pcFmt, dwError, ... )
+#endif
 
+void            vMBPortTimerPoll(  );
+BOOL            xMBPortSerialPoll(  );
+BOOL            xMBPortSerialSetTimeout( DWORD dwTimeoutMs );
+
+SHORT           xMBPortStartPoolingThread(  );
+SHORT           xMBPortStopPoolingThread(  );
+
+#ifdef __cplusplus
+PR_END_EXTERN_C
+#endif
 #endif

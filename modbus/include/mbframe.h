@@ -16,11 +16,15 @@
   * License along with this library; if not, write to the Free Software
   * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   *
-  * File: $Id: mbframe.h,v 1.4 2006/05/13 12:34:32 wolti Exp $
+  * File: $Id: mbframe.h,v 1.5 2006/06/16 00:08:52 wolti Exp $
   */
 
 #ifndef _MB_FRAME_H
 #define _MB_FRAME_H
+
+#ifdef __cplusplus
+PR_BEGIN_EXTERN_C
+#endif
 
 /*!
  * Constants which defines the format of a modbus frame.
@@ -64,9 +68,13 @@ typedef         eMBErrorCode( *peMBFrameSend ) ( UCHAR slaveAddress,
                                                  const UCHAR * pucFrame,
                                                  USHORT usLength );
 
-typedef         eMBErrorCode( *peMBFrameInit ) ( UCHAR slaveAddress,
+typedef         eMBErrorCode( *peMBFrameInit ) ( UCHAR ucPort, 
+												 UCHAR slaveAddress,
                                                  ULONG ulBaudRate,
                                                  eMBParity eParity );
 
+#ifdef __cplusplus
+PR_END_EXTERN_C
+#endif
 
 #endif

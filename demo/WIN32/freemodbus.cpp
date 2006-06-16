@@ -1,5 +1,5 @@
 /*
- * FreeModbus Libary: MCF5235 Demo Application
+ * FreeModbus Libary: Win32 Demo Application
  * Copyright (C) 2006 Christian Walter <wolti@sil.at>
  * Parts of crt0.S Copyright (c) 1995, 1996, 1998 Cygnus Support
  *
@@ -17,54 +17,61 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * File: $Id: demo.c,v 1.2 2006/06/15 15:38:55 wolti Exp $
+ * File: $Id: freemodbus.cpp,v 1.1 2006/06/16 00:13:38 wolti Exp $
  */
 
-#include "mcf5xxx.h"
-#include "mcf523x.h"
-
-#include "mb.h"
-#include "mbport.h"
+#include "stdafx.h"
 
 /* ----------------------- Modbus includes ----------------------------------*/
 #include "mb.h"
 #include "mbport.h"
 
 /* ----------------------- Defines ------------------------------------------*/
+#define PROG            _T("freemodbus")
+
 #define REG_INPUT_START 1000
 #define REG_INPUT_NREGS 4
+#define REG_HOLDING_START 2000
+#define REG_HOLDING_NREGS 130
 
 /* ----------------------- Static variables ---------------------------------*/
 static USHORT   usRegInputStart = REG_INPUT_START;
 static USHORT   usRegInputBuf[REG_INPUT_NREGS];
-
+static USHORT	usRegHoldingStart = REG_HOLDING_START;
+static USHORT	usRegHoldingBuf[REG_HOLDING_NREGS];
 
 int
-main( int argc, char *argv[], char *envp[] )
+_tmain( int argc, _TCHAR * argv[] )
 {
-    //xMBPortSerialInit (9600UL, 8, MB_PAR_EVEN);
-    //vMBPortSerialEnable (TRUE , FALSE);
-    //xMBPortTimersInit( 200 );
-    //vMBPortTimersEnable();
-    // 
+    int             iExitCode;
+
     const UCHAR     ucSlaveID[] = { 0xAA, 0xBB, 0xCC };
-    eMBErrorCode    eStatus;
 
-    eStatus = eMBInit( MB_RTU, 0x0A, 0, 38400, MB_PAR_EVEN );
-
-    eStatus = eMBSetSlaveID( 0x34, TRUE, ucSlaveID, 3 );
-
-    /* Enable the Modbus Protocol Stack. */
-    eStatus = eMBEnable(  );
-
-    for( ;; )
+    if( eMBInit( MB_RTU, 0x0A, 1, 38400, MB_PAR_EVEN ) != MB_ENOERR )
     {
-        ( void )eMBPoll(  );
-
-        /* Here we simply count the number of poll cycles. */
-        usRegInputBuf[0]++;
+        _ftprintf( stderr, _T( "%s: can't initialize modbus stack!\r\n" ),
+                   PROG );
+        iExitCode = EXIT_FAILURE;
     }
-    return 0;
+    else if( eMBSetSlaveID( 0x34, TRUE, ucSlaveID, 3 ) != MB_ENOERR )
+    {
+        _ftprintf( stderr, _T( "%s: can't set slave id!\r\n" ), PROG );
+        iExitCode = EXIT_FAILURE;
+    }
+    else if( xMBPortStartPoolingThread(  ) != MB_ENOERR )
+    {
+        _ftprintf( stderr, _T( "%s: can't start pooling thread!\r\n" ),
+                   PROG );
+        iExitCode = EXIT_FAILURE;
+    }
+    else
+    {
+        for( ;; )
+        {
+        }
+        iExitCode = EXIT_SUCCESS;
+    }
+    return iExitCode;
 }
 
 eMBErrorCode
@@ -99,7 +106,45 @@ eMBErrorCode
 eMBRegHoldingCB( UCHAR * pucRegBuffer, USHORT usAddress, USHORT usNRegs,
                  eMBRegisterMode eMode )
 {
-    return MB_ENOREG;
+    eMBErrorCode    eStatus = MB_ENOERR;
+    int             iRegIndex;
+
+    if( ( usAddress >= REG_HOLDING_START ) &&
+        ( usAddress + usNRegs <= REG_HOLDING_START + REG_HOLDING_NREGS ) )
+    {
+        iRegIndex = ( int )( usAddress - usRegHoldingStart );
+        switch ( eMode )
+        {
+                /* Pass current register values to the protocol stack. */
+            case MB_REG_READ:
+                while( usNRegs > 0 )
+                {
+                    *pucRegBuffer++ = 
+						( UCHAR )( usRegHoldingBuf[iRegIndex] >> 8 );
+                    *pucRegBuffer++ = 
+						( UCHAR )( usRegHoldingBuf[iRegIndex] & 0xFF );
+                    iRegIndex++;
+                    usNRegs--;
+                }
+                break;
+
+                /* Update current register values with new values from the
+                 * protocol stack. */
+            case MB_REG_WRITE:
+                while( usNRegs > 0 )
+                {
+                    usRegHoldingBuf[iRegIndex] = *pucRegBuffer++ << 8;
+                    usRegHoldingBuf[iRegIndex] |= *pucRegBuffer++;
+                    iRegIndex++;
+                    usNRegs--;
+                }
+        }
+    }
+    else
+    {
+        eStatus = MB_ENOREG;
+    }
+    return eStatus;
 }
 
 

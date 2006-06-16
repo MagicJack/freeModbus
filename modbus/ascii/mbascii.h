@@ -16,16 +16,20 @@
   * License along with this library; if not, write to the Free Software
   * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   *
-  * File: $Id: mbascii.h,v 1.4 2006/05/13 12:34:32 wolti Exp $
+  * File: $Id: mbascii.h,v 1.5 2006/06/16 00:08:52 wolti Exp $
   */
 
 #ifndef _MB_ASCII_H
 #define _MB_ASCII_H
 
+#ifdef __cplusplus
+PR_BEGIN_EXTERN_C
+#endif
+
 #if MB_ASCII_ENABLED > 0
 
-eMBErrorCode    eMBASCIIInit( UCHAR slaveAddress, ULONG ulBaudRate,
-                              eMBParity eParity );
+eMBErrorCode    eMBASCIIInit( UCHAR slaveAddress, UCHAR ucPort,
+							  ULONG ulBaudRate, eMBParity eParity );
 
 eMBErrorCode    eMBASCIIStart( void );
 
@@ -41,6 +45,10 @@ BOOL            xMBASCIITransmitFSM( void );
 
 BOOL            xMBASCIITimerT1SExpired( void );
 
+#endif
+
+#ifdef __cplusplus
+PR_END_EXTERN_C
 #endif
 
 #endif

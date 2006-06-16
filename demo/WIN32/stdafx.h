@@ -1,6 +1,7 @@
 /*
- * FreeModbus Libary: STR71x Port
+ * FreeModbus Libary: Win32 Demo Application
  * Copyright (C) 2006 Christian Walter <wolti@sil.at>
+ * Parts of crt0.S Copyright (c) 1995, 1996, 1998 Cygnus Support
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,45 +17,16 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * File: $Id: port.h,v 1.6 2006/06/15 15:27:16 wolti Exp $
+ * File: $Id: stdafx.h,v 1.1 2006/06/16 00:16:12 wolti Exp $
  */
 
-#ifndef _PORT_H
-#define _PORT_H
+#pragma once
 
-#include "assert.h"
-#include "FreeRTOS.h"
 
-/* work aroung a problem when inline is also defined in 71x_conf.h */
-#ifdef INLINE
-#undef INLINE  
-#endif
+#define WIN32_LEAN_AND_MEAN
+#include <stdio.h>
+#include <tchar.h>
+#include <stdlib.h>
 
-#define INLINE                      inline
+#include <windows.h>
 
-#define PR_BEGIN_EXTERN_C           extern "C" {
-#define	PR_END_EXTERN_C             }
-
-#define ENTER_CRITICAL_SECTION( )   portENTER_CRITICAL( )
-#define EXIT_CRITICAL_SECTION( )    portEXIT_CRITICAL( )
-
-typedef char    BOOL;
-
-typedef unsigned char UCHAR;
-typedef char    CHAR;
-
-typedef unsigned short USHORT;
-typedef short   SHORT;
-
-typedef unsigned long ULONG;
-typedef long    LONG;
-
-#ifndef TRUE
-#define TRUE            1
-#endif
-
-#ifndef FALSE
-#define FALSE           0
-#endif
-
-#endif

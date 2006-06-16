@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * File: $Id: port.h,v 1.3 2006/05/14 21:55:01 wolti Exp $
+ * File: $Id: port.h,v 1.4 2006/06/15 15:28:22 wolti Exp $
  */
 
 #ifndef _PORT_H
@@ -24,6 +24,10 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+
+#define	INLINE                      inline
+#define PR_BEGIN_EXTERN_C           extern "C" {
+#define	PR_END_EXTERN_C             }
 
 #define ENTER_CRITICAL_SECTION( )   cli()
 #define EXIT_CRITICAL_SECTION( )    sei()
