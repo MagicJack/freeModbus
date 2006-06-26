@@ -23,7 +23,6 @@
 #ifdef __cplusplus
 PR_BEGIN_EXTERN_C
 #endif
-
 /*! \defgroup modbus_utils Utilities
  *
  * This module contains some utility functions which can be used by
@@ -31,11 +30,9 @@ PR_BEGIN_EXTERN_C
  * bitfields backed by a character array buffer.
  *
  */
-
 /*! \addtogroup modbus_utils
  *  @{
  */
-
 /*! \brief Function to set bits in a byte buffer.
  *
  * This function allows the efficient use of an array to implement bitfields.
@@ -48,7 +45,7 @@ PR_BEGIN_EXTERN_C
  *   is overwritten.
  * \param usBitOffset The starting address of the bits to set. The first
  *   bit has the offset 0.
- * \param usNBits Number of bits to modify. The value must always be smaller
+ * \param ucNBits Number of bits to modify. The value must always be smaller
  *   than 8.
  * \param ucValues Thew new values for the bits. The value for the first bit
  *   starting at <code>usBitOffset</code> is the LSB of the value
@@ -67,7 +64,8 @@ PR_BEGIN_EXTERN_C
  * xMBUtilSetBits( ucBits, 8, 8, 0x5A);
  * \endcode
  */
-void    xMBUtilSetBits(UCHAR *ucByteBuf, USHORT usBitOffset, UCHAR usNBits, UCHAR ucValues);
+void            xMBUtilSetBits( UCHAR * ucByteBuf, USHORT usBitOffset,
+                                UCHAR ucNBits, UCHAR ucValues );
 
 /*! \brief Function to read bits in a byte buffer.
  *
@@ -77,7 +75,7 @@ void    xMBUtilSetBits(UCHAR *ucByteBuf, USHORT usBitOffset, UCHAR usNBits, UCHA
  * \param ucByteBuf A buffer where the bit values are stored.
  * \param usBitOffset The starting address of the bits to set. The first
  *   bit has the offset 0.
- * \param usNBits Number of bits to modify. The value must always be smaller
+ * \param ucNBits Number of bits to modify. The value must always be smaller
  *   than 8.
  *
  * \code
@@ -88,12 +86,12 @@ void    xMBUtilSetBits(UCHAR *ucByteBuf, USHORT usBitOffset, UCHAR usNBits, UCHA
  * ucResult = xMBUtilGetBits( ucBits, 3, 8 );
  * \endcode
  */
-UCHAR   xMBUtilGetBits(UCHAR *ucByteBuf, USHORT usBitOffset, UCHAR usNBits);
+UCHAR           xMBUtilGetBits( UCHAR * ucByteBuf, USHORT usBitOffset,
+                                UCHAR ucNBits );
 
 /*! @} */
 
 #ifdef __cplusplus
 PR_END_EXTERN_C
 #endif
-
 #endif

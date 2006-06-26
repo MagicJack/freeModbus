@@ -16,7 +16,7 @@
   * License along with this library; if not, write to the Free Software
   * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   *
-  * File: $Id: mbascii.c,v 1.10 2006/06/17 00:14:08 wolti Exp $
+  * File: $Id: mbascii.c,v 1.11 2006/06/18 09:57:03 wolti Exp $
   */
 
 /* ----------------------- System includes ----------------------------------*/
@@ -96,8 +96,8 @@ static volatile UCHAR ucMBLFCharacter;
 
 /* ----------------------- Start implementation -----------------------------*/
 eMBErrorCode
-eMBASCIIInit( UCHAR ucSlaveAddress, UCHAR ucPort, ULONG ulBaudRate, 
-			  eMBParity eParity )
+eMBASCIIInit( UCHAR ucSlaveAddress, UCHAR ucPort, ULONG ulBaudRate,
+              eMBParity eParity )
 {
     eMBErrorCode    eStatus = MB_ENOERR;
 
@@ -124,7 +124,7 @@ eMBASCIIStart( void )
 {
     ENTER_CRITICAL_SECTION(  );
     vMBPortSerialEnable( TRUE, FALSE );
-	eRcvState = STATE_RX_IDLE;
+    eRcvState = STATE_RX_IDLE;
     EXIT_CRITICAL_SECTION(  );
 
     /* No special startup required for ASCII. */
@@ -134,15 +134,14 @@ eMBASCIIStart( void )
 void
 eMBASCIIStop( void )
 {
-	ENTER_CRITICAL_SECTION(  );
-	vMBPortSerialEnable( FALSE, FALSE );
-	vMBPortTimersDisable(  );
-	EXIT_CRITICAL_SECTION(  );
+    ENTER_CRITICAL_SECTION(  );
+    vMBPortSerialEnable( FALSE, FALSE );
+    vMBPortTimersDisable(  );
+    EXIT_CRITICAL_SECTION(  );
 }
 
 eMBErrorCode
-eMBASCIIReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame,
-                 USHORT * pusLength )
+eMBASCIIReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
 {
     eMBErrorCode    eStatus = MB_ENOERR;
 
@@ -161,8 +160,7 @@ eMBASCIIReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame,
         /* Total length of Modbus-PDU is Modbus-Serial-Line-PDU minus
          * size of address field and CRC checksum.
          */
-        *pusLength =
-            usRcvBufferPos - MB_SER_PDU_PDU_OFF - MB_SER_PDU_SIZE_LRC;
+        *pusLength = usRcvBufferPos - MB_SER_PDU_PDU_OFF - MB_SER_PDU_SIZE_LRC;
 
         /* Return the start of the Modbus PDU to the caller. */
         *pucFrame = ( UCHAR * ) & ucASCIIBuf[MB_SER_PDU_PDU_OFF];

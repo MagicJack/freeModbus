@@ -16,7 +16,7 @@
   * License along with this library; if not, write to the Free Software
   * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   *
-  * File: $Id: mbport.h,v 1.11 2006/06/17 00:25:55 wolti Exp $
+  * File: $Id: mbport.h,v 1.14 2006/06/26 19:26:50 wolti Exp $
   */
 
 #ifndef _MB_PORT_H
@@ -55,14 +55,16 @@ BOOL            xMBPortEventInit( void );
 
 BOOL            xMBPortEventPost( eMBEventType eEvent );
 
-BOOL            xMBPortEventGet( /*@out@*/ eMBEventType * eEvent );
+BOOL            xMBPortEventGet(  /*@out@ */ eMBEventType * eEvent );
 
 /* ----------------------- Serial port functions ----------------------------*/
 
-BOOL            xMBPortSerialInit( UCHAR ucPort, ULONG ulBaudRate, 
-								   UCHAR ucDataBits, eMBParity eParity );
+BOOL            xMBPortSerialInit( UCHAR ucPort, ULONG ulBaudRate,
+                                   UCHAR ucDataBits, eMBParity eParity );
 
-void			xMBPortSerialClose( void );
+void            vMBPortClose( void );
+
+void            xMBPortSerialClose( void );
 
 void            vMBPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable );
 
@@ -73,7 +75,7 @@ INLINE BOOL     xMBPortSerialPutByte( CHAR ucByte );
 /* ----------------------- Timers functions ---------------------------------*/
 BOOL            xMBPortTimersInit( USHORT usTim1Timerout100us );
 
-void			xMBPortTimersClose( void );
+void            xMBPortTimersClose( void );
 
 INLINE void     vMBPortTimersEnable( void );
 
@@ -99,8 +101,18 @@ extern          BOOL( *pxMBFrameCBTransmitterEmpty ) ( void );
 
 extern          BOOL( *pxMBPortCBTimerExpired ) ( void );
 
+/* ----------------------- TCP port functions -------------------------------*/
+BOOL            xMBTCPPortInit( USHORT usTCPPort );
+
+void            vMBTCPPortClose( void );
+
+void            vMBTCPPortDisable( void );
+
+BOOL            xMBTCPPortGetRequest( UCHAR **ppucMBTCPFrame, USHORT * usTCPLength );
+
+BOOL            xMBTCPPortSendResponse( const UCHAR *pucMBTCPFrame, USHORT usTCPLength );
+
 #ifdef __cplusplus
 PR_END_EXTERN_C
 #endif
-
 #endif

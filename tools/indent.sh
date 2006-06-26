@@ -9,7 +9,7 @@ indent \
     --braces-after-if-line \
     --braces-after-struct-decl-line \
     --brace-indent0 \
-    --case-indentation4 \
+    --case-indentation0 \
     --no-space-after-function-call-names \
     --no-space-after-for \
     --no-space-after-if \
@@ -20,6 +20,6 @@ indent \
     --indent-level4 \
     --honour-newlines \
     --no-tabs \
-    --line-length80 \
+    --line-length100 \
     $@
     
