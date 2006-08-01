@@ -1,4 +1,12 @@
 
+2006-08-01 (REL_0_8) Christian Walter <wolti@sil.at>
+ Notes: Added Linux RTU/ASCII port.
+
+ Detailed notes:
+   - FEATURES: Added a new Linux RTU/ASCII port. The port should work
+       on any linux distribution and it should be possible to run it
+       on uCLinux.
+
 2006-06-26 (REL_0_7) Christian Walter <wolti@sil.at>
  Notes: Changed the WIN32 serial port to better fit into the design.
  
