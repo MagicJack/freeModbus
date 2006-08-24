@@ -1,4 +1,13 @@
 
+2006-08-22 (REL_0_82) Christian Walter <wolti@sil.at>
+ Notes: Fixed bug with Modbus ASCII support
+
+ Detailed notes:
+   - BUG: During the last upgrade an error was introduced in the
+       initialization code of Modbus ASCII and therefore ASCII
+       support was broken. The bug is fixed now and was tested with
+       the Win32 port.
+
 2006-08-22 (REL_0_81) Christian Walter <wolti@sil.at>
  Notes: Added porting guide
 
@@ -12,7 +21,7 @@
 
  Detailed notes:
    - FEATURES: Added a new Linux RTU/ASCII port. The port should work
-       on any linux distribution and it should be possible to run it
+       on any Linux distribution and it should be possible to run it
        on uCLinux.
 
 2006-06-26 (REL_0_7) Christian Walter <wolti@sil.at>
@@ -40,7 +49,7 @@
 2006-06-18 Christian Walter <wolti@sil.at>
 
  Detailed notes:
-   - OTHER: while working on the Win32 port some linefeeds got
+   - OTHER: while working on the Win32 port some line feeds got
        wrong. Also some source files used tabs instead of spaces.
    - OTHER: prototypes for xMBUtilSetBits and xMBUtilGetBits fixed.
        usNBits should be ucNBits by convention.
@@ -53,7 +62,7 @@
    - FEATURES: implement shutdown functionality for protocol stack.
    - FEATURES: protocol stack can be enabled and disabled during runtime.
    - FEATURES: interface functions now do more error checking. For
-       example if eMBPool is called in an unitialized state.
+       example if eMBPool is called in an uninitialized state.
    - FEATURES: extended Win32 demo application to use the new features.
    - BUG: fixed bug in Win32 demo for ASCII mode.
 
@@ -74,7 +83,7 @@
 
 2006-05-01 Christian Walter <wolti@sil.at>
  Notes: This version removes the t1.5 timers from the Modbus RTU
-   implementation because noonene actually uses it and the CPU
+   implementation because no one actually uses it and the CPU
    load is very high. T
    In addition some documentation cleanups has been done and the
    ARM demo has been updated.
@@ -91,7 +100,7 @@
    (write multiple coils, read discrete input)
 
  Detailed notes:
-  - BUG: some function used the wrong datatypes
+  - BUG: some function used the wrong data types
   - FEATURES: added support for write multiple coils function.
   - FEATURES: added support for read discrete input.
   - OTHER: some code cleanups with lint tool.
@@ -99,10 +108,10 @@
 2006-02-28 Christian Walter <wolti@sil.at>
 
  Notes: The new version 0.31 adds support for reading and writing the
-   coil registers and add some bugfixes.
+   coil registers and add some bug fixes.
    
  Detailed notes:
-  - BUG: fixed bug with to small modbus requests beeing ignored.
+  - BUG: fixed bug with to small modbus requests being ignored.
   - FEATURES: added support for write single coil function.
   - FEATURES: added support for working with byte packed bit fields
      to support coils and discrete inputs better.
