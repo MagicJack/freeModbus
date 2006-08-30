@@ -1,3 +1,13 @@
+2006-08-30 (REL_9) Christian Walter <wolti@sil.at>:
+ Notes: Added lwIP port for the MCF5235 target. The lwIP part is
+   generic and therefore FreeModbus now works on any target with
+   lwIP support.
+        
+ Detailed notes:
+   - FEATURES: Incoperated MCF5235 FreeRTOS/lwIP port done by the 
+       author in this project.
+   - FEATURES: Added lwIP port for FreeModbus
+   - FEATURES: Added demo application for FreeModbus and lwIP.
 
 2006-08-22 (REL_0_82) Christian Walter <wolti@sil.at>
  Notes: Fixed bug with Modbus ASCII support
