@@ -16,7 +16,7 @@
   * License along with this library; if not, write to the Free Software
   * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   *
-  * File: $Id: mb.c,v 1.19 2006/10/12 08:54:34 wolti Exp $
+  * File: $Id: mb.c,v 1.20 2006/10/30 08:11:51 wolti Exp $
   */
 
 /* ----------------------- System includes ----------------------------------*/
@@ -259,9 +259,12 @@ eMBClose( void )
 {
     eMBErrorCode    eStatus = MB_ENOERR;
 
-    if( ( eMBState == STATE_DISABLED ) && ( pvMBFrameCloseCur != NULL ) )
+    if( eMBState == STATE_DISABLED )
     {
-        pvMBFrameCloseCur(  );
+        if( pvMBFrameCloseCur != NULL )
+        {
+            pvMBFrameCloseCur(  );
+        }
     }
     else
     {
@@ -291,18 +294,23 @@ eMBEnable( void )
 eMBErrorCode
 eMBDisable( void )
 {
-    eMBErrorCode    eStatus = MB_ENOERR;
+  eMBErrorCode    eStatus;
 
-    if( eMBState == STATE_ENABLED )
-    {
-        pvMBFrameStopCur(  );
-        eMBState = STATE_DISABLED;
-    }
-    else
-    {
-        eStatus = MB_EILLSTATE;
-    }
-    return eStatus;
+  if( eMBState == STATE_ENABLED )
+  {
+    pvMBFrameStopCur(  );
+    eMBState = STATE_DISABLED;
+    eStatus = MB_ENOERR;
+  }
+  else if( eMBState == STATE_DISABLED )
+  {
+    eStatus = MB_ENOERR;
+  }
+  else
+  {
+    eStatus = MB_EILLSTATE;
+  }
+  return eStatus;
 }
 
 eMBErrorCode
