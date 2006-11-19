@@ -1,11 +1,25 @@
 
+2006-10-30 (REL_1_1_0) Christian Walter <wolti@sil.at>:
+ Notes: Added support for Read/Write Multiple Registers function
+   (0x17). Added some tips to reduce memory requirements. 
+   Added MSP430 Port for GCC and Rowley Crossworks.
+
+ Detailed notes:
+   - FEATURE (MSP430): Added new MSP430 port.
+   - FEATURE (ALL): Added support for Read/Write Multiple Registers
+      function (0x17). The implementation simply makes two callbacks
+      to the eMBRegHoldingCB function where frist the values are
+      written and then the other register values are read.
+   - FEATURE (ALL): Added some tips on reducing memory requirements
+       with the protocol stack.
+
 2006-10-30 (REL_1_0_5) Christian Walter <wolti@sil.at>:
  Notes: eMBDisable and eMBClose can now be called multiple times 
    which makes shutdown of the protocol stack easier.
    Fixed bug in RTU state machine where we switched from the
    error state immediately to the idle state. Correct behaviour
    would be to wait till the end of frame.
-   Added new STR71X GCC port which uses only freely avaiable tools
+   Added new STR71X GCC port which uses only freely available tools
    like GNU ARM, OpenOCD (Wiggler) and GDB. 
 
  Detailed notes:
@@ -16,7 +30,7 @@
       eMBClose also supports beeing called multiple times in 
       which pvMBFrameCloseCur( ) is called when the protocol stack
       is in state STATE_DISABLED.
-   - FEATURE (RTU): Fixed bug in xMBRTUReceiveFSM where the error
+   - BUG (RTU): Fixed bug in xMBRTUReceiveFSM where the error
      state is immediately left because of a missing break. Instead
      we should wait till the damaged frame is finished.
 

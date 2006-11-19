@@ -16,7 +16,7 @@
   * License along with this library; if not, write to the Free Software
   * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
   *
-  * File: $Id: mbconfig.h,v 1.12 2006/06/26 18:52:49 wolti Exp $
+  * File: $Id: mbconfig.h,v 1.13 2006/11/03 16:53:36 wolti Exp $
   */
 
 #ifndef _MB_CONFIG_H
@@ -25,9 +25,7 @@
 #ifdef __cplusplus
 PR_BEGIN_EXTERN_C
 #endif
-
 /* ----------------------- Defines ------------------------------------------*/
-
 /*! \defgroup modbus_cfg Modbus Configuration
  *
  * Most modules in the protocol stack are completly optional and can be
@@ -41,13 +39,10 @@ PR_BEGIN_EXTERN_C
  */
 /*! \brief If Modbus ASCII support is enabled. */
 #define MB_ASCII_ENABLED                        (  1 )
-
 /*! \brief If Modbus RTU support is enabled. */
 #define MB_RTU_ENABLED                          (  1 )
-
 /*! \brief If Modbus TCP support is enabled. */
 #define MB_TCP_ENABLED                          (  0 )
-
 /*! \brief The character timeout value for Modbus ASCII.
  *
  * The character timeout value is not fixed for Modbus ASCII and is therefore
@@ -90,6 +85,8 @@ PR_BEGIN_EXTERN_C
 #define MB_FUNC_WRITE_MULTIPLE_COILS_ENABLED    (  1 )
 /*! \brief If the <em>Read Discrete Inputs</em> function should be enabled. */
 #define MB_FUNC_READ_DISCRETE_INPUTS_ENABLED    (  1 )
+/*! \brief If the <em>Read/Write Multiple Registers</em> function should be enabled. */
+#define MB_FUNC_READWRITE_HOLDING_ENABLED       (  1 )
 /*! @} */
 #ifdef __cplusplus
     PR_END_EXTERN_C
