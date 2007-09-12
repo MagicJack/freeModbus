@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * File: $Id: mbrtu.c,v 1.17 2007/02/18 23:50:27 wolti Exp $
+ * File: $Id: mbrtu.c,v 1.18 2007/09/12 10:15:56 wolti Exp $
  */
 
 /* ----------------------- System includes ----------------------------------*/
@@ -230,6 +230,9 @@ xMBRTUReceiveFSM( void )
 
     assert( eSndState == STATE_TX_IDLE );
 
+    /* Always read the character. */
+    ( void )xMBPortSerialGetByte( ( CHAR * ) & ucByte );
+
     switch ( eRcvState )
     {
         /* If we have received a character in the init state we have to
@@ -252,7 +255,6 @@ xMBRTUReceiveFSM( void )
          */
     case STATE_RX_IDLE:
         usRcvBufferPos = 0;
-        ( void )xMBPortSerialGetByte( ( CHAR * ) & ucByte );
         ucRTUBuf[usRcvBufferPos++] = ucByte;
         eRcvState = STATE_RX_RCV;
 
@@ -268,7 +270,6 @@ xMBRTUReceiveFSM( void )
     case STATE_RX_RCV:
         if( usRcvBufferPos < MB_SER_PDU_SIZE_MAX )
         {
-            ( void )xMBPortSerialGetByte( ( CHAR * ) & ucByte );
             ucRTUBuf[usRcvBufferPos++] = ucByte;
         }
         else
@@ -277,7 +278,6 @@ xMBRTUReceiveFSM( void )
         }
         vMBPortTimersEnable(  );
         break;
-
     }
     return xTaskNeedSwitch;
 }
