@@ -1,6 +1,6 @@
 #!/bin/sh
 
-indent \
+/cygdrive/c/GnuWin32/bin/indent \
     --declaration-indentation16 \
     --procnames-start-lines \
     --blank-lines-after-declarations \
