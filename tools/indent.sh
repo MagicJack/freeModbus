@@ -1,9 +1,11 @@
 #!/bin/sh
 
-/cygdrive/c/GnuWin32/bin/indent \
+MYDIR="/cygdrive/c/GnuWin32/bin/"
+
+$MYDIR/indent.exe --version
+$MYDIR/indent.exe \
     --declaration-indentation16 \
     --procnames-start-lines \
-    --blank-lines-after-declarations \
     --blank-lines-after-procedures \
     --break-before-boolean-operator \
     --braces-after-if-line \
@@ -18,8 +20,9 @@
     --space-after-parentheses \
     --dont-format-comments \
     --indent-level4 \
-    --honour-newlines \
+    --ignore-newlines \
     --no-tabs \
-    --line-length100 \
+    --line-length120 \
     $@
-    
+   
+unix2dos $@
