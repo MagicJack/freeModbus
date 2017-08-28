@@ -89,7 +89,7 @@ eMBFuncReadCoils( UCHAR * pucFrame, USHORT * usLen )
          * return Modbus illegal data value exception. 
          */
         if( ( usCoilCount >= 1 ) &&
-            ( usCoilCount < MB_PDU_FUNC_READ_COILCNT_MAX ) )
+            ( usCoilCount <= MB_PDU_FUNC_READ_COILCNT_MAX ) )
         {
             /* Set the current PDU data pointer to the beginning. */
             pucFrameCur = &pucFrame[MB_PDU_FUNC_OFF];
