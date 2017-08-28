@@ -182,8 +182,8 @@ eMBFuncReadHoldingRegister(uint8_t *pucFrame, uint16_t *usLen)
         usRegAddress |= (uint16_t)(pucFrame[MB_PDU_FUNC_READ_ADDR_OFF + 1]);
         usRegAddress++;
 
-        usRegCount = (uint16_t)(pucFrame[MB_PDU_FUNC_READ_REGCNT_OFF] << 8);
-        usRegCount = (uint16_t)(pucFrame[MB_PDU_FUNC_READ_REGCNT_OFF + 1]);
+        usRegCount  = (uint16_t)(pucFrame[MB_PDU_FUNC_READ_REGCNT_OFF] << 8);
+        usRegCount |= (uint16_t)(pucFrame[MB_PDU_FUNC_READ_REGCNT_OFF + 1]);
 
         /* Check if the number of registers to read is valid. If not
          * return Modbus illegal data value exception.

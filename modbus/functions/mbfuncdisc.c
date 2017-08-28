@@ -69,7 +69,7 @@ eMBFuncReadDiscreteInputs(uint8_t *pucFrame, uint16_t *usLen)
          * return Modbus illegal data value exception.
          */
         if((usDiscreteCnt >= 1) &&
-            (usDiscreteCnt < MB_PDU_FUNC_READ_DISCCNT_MAX))
+            (usDiscreteCnt <= MB_PDU_FUNC_READ_DISCCNT_MAX))
         {
             /* Set the current PDU data pointer to the beginning. */
             pucFrameCur = &pucFrame[MB_PDU_FUNC_OFF];
