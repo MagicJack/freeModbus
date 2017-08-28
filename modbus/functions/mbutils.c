@@ -1,4 +1,4 @@
-/* 
+/*
  * FreeModbus Libary: A portable Modbus implementation for Modbus ASCII/RTU.
  * Copyright (c) 2006 Christian Walter <wolti@sil.at>
  * All rights reserved.
@@ -44,61 +44,61 @@
 
 /* ----------------------- Start implementation -----------------------------*/
 void
-xMBUtilSetBits( UCHAR * ucByteBuf, USHORT usBitOffset, UCHAR ucNBits,
-                UCHAR ucValue )
+xMBUtilSetBits(uint8_t *ucByteBuf, uint16_t usBitOffset, uint8_t ucNBits,
+               uint8_t ucValue)
 {
-    USHORT          usWordBuf;
-    USHORT          usMask;
-    USHORT          usByteOffset;
-    USHORT          usNPreBits;
-    USHORT          usValue = ucValue;
+    uint16_t        usWordBuf;
+    uint16_t        usMask;
+    uint16_t        usByteOffset;
+    uint16_t        usNPreBits;
+    uint16_t        usValue = ucValue;
 
-    assert( ucNBits <= 8 );
-    assert( ( size_t )BITS_UCHAR == sizeof( UCHAR ) * 8 );
+    assert(ucNBits <= 8);
+    assert((size_t)BITS_UCHAR == sizeof(uint8_t) * 8);
 
     /* Calculate byte offset for first byte containing the bit values starting
      * at usBitOffset. */
-    usByteOffset = ( USHORT )( ( usBitOffset ) / BITS_UCHAR );
+    usByteOffset = (uint16_t)((usBitOffset) / BITS_UCHAR);
 
     /* How many bits precede our bits to set. */
-    usNPreBits = ( USHORT )( usBitOffset - usByteOffset * BITS_UCHAR );
+    usNPreBits = (uint16_t)(usBitOffset - usByteOffset * BITS_UCHAR);
 
     /* Move bit field into position over bits to set */
     usValue <<= usNPreBits;
 
     /* Prepare a mask for setting the new bits. */
-    usMask = ( USHORT )( ( 1 << ( USHORT ) ucNBits ) - 1 );
+    usMask   = (uint16_t)((1 << (uint16_t) ucNBits) - 1);
     usMask <<= usBitOffset - usByteOffset * BITS_UCHAR;
 
     /* copy bits into temporary storage. */
-    usWordBuf = ucByteBuf[usByteOffset];
+    usWordBuf  = ucByteBuf[usByteOffset];
     usWordBuf |= ucByteBuf[usByteOffset + 1] << BITS_UCHAR;
 
     /* Zero out bit field bits and then or value bits into them. */
-    usWordBuf = ( USHORT )( ( usWordBuf & ( ~usMask ) ) | usValue );
+    usWordBuf = (uint16_t)((usWordBuf & (~usMask)) | usValue);
 
     /* move bits back into storage */
-    ucByteBuf[usByteOffset] = ( UCHAR )( usWordBuf & 0xFF );
-    ucByteBuf[usByteOffset + 1] = ( UCHAR )( usWordBuf >> BITS_UCHAR );
+    ucByteBuf[usByteOffset]     = (uint8_t)(usWordBuf & 0xFF);
+    ucByteBuf[usByteOffset + 1] = (uint8_t)(usWordBuf >> BITS_UCHAR);
 }
 
-UCHAR
-xMBUtilGetBits( UCHAR * ucByteBuf, USHORT usBitOffset, UCHAR ucNBits )
+uint8_t
+xMBUtilGetBits(uint8_t *ucByteBuf, uint16_t usBitOffset, uint8_t ucNBits)
 {
-    USHORT          usWordBuf;
-    USHORT          usMask;
-    USHORT          usByteOffset;
-    USHORT          usNPreBits;
+    uint16_t        usWordBuf;
+    uint16_t        usMask;
+    uint16_t        usByteOffset;
+    uint16_t        usNPreBits;
 
     /* Calculate byte offset for first byte containing the bit values starting
      * at usBitOffset. */
-    usByteOffset = ( USHORT )( ( usBitOffset ) / BITS_UCHAR );
+    usByteOffset = (uint16_t)((usBitOffset) / BITS_UCHAR);
 
     /* How many bits precede our bits to set. */
-    usNPreBits = ( USHORT )( usBitOffset - usByteOffset * BITS_UCHAR );
+    usNPreBits = (uint16_t)(usBitOffset - usByteOffset * BITS_UCHAR);
 
     /* Prepare a mask for setting the new bits. */
-    usMask = ( USHORT )( ( 1 << ( USHORT ) ucNBits ) - 1 );
+    usMask = (uint16_t)((1 << (uint16_t) ucNBits) - 1);
 
     /* copy bits into temporary storage. */
     usWordBuf = ucByteBuf[usByteOffset];
@@ -110,15 +110,15 @@ xMBUtilGetBits( UCHAR * ucByteBuf, USHORT usBitOffset, UCHAR ucNBits )
     /* mask away bits above the requested bitfield. */
     usWordBuf &= usMask;
 
-    return ( UCHAR ) usWordBuf;
+    return (uint8_t) usWordBuf;
 }
 
 eMBException
-prveMBError2Exception( eMBErrorCode eErrorCode )
+prveMBError2Exception(eMBErrorCode eErrorCode)
 {
     eMBException    eStatus;
 
-    switch ( eErrorCode )
+    switch (eErrorCode)
     {
         case MB_ENOERR:
             eStatus = MB_EX_NONE;

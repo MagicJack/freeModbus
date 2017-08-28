@@ -1,4 +1,4 @@
-/* 
+/*
  * FreeModbus Libary: A portable Modbus implementation for Modbus ASCII/RTU.
  * Copyright (c) 2006 Christian Walter <wolti@sil.at>
  * All rights reserved.
@@ -60,37 +60,25 @@ typedef enum
 } eMBParity;
 
 /* ----------------------- Supporting functions -----------------------------*/
-BOOL            xMBPortEventInit( void );
-
-BOOL            xMBPortEventPost( eMBEventType eEvent );
-
-BOOL            xMBPortEventGet(  /*@out@ */ eMBEventType * eEvent );
+BOOL            xMBPortEventInit(void);
+BOOL            xMBPortEventPost(eMBEventType eEvent);
+BOOL            xMBPortEventGet( /*@out@ */ eMBEventType *eEvent);
 
 /* ----------------------- Serial port functions ----------------------------*/
-
-BOOL            xMBPortSerialInit( UCHAR ucPort, ULONG ulBaudRate,
-                                   UCHAR ucDataBits, eMBParity eParity );
-
-void            vMBPortClose( void );
-
-void            xMBPortSerialClose( void );
-
-void            vMBPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable );
-
-BOOL            xMBPortSerialGetByte( CHAR * pucByte );
-
-BOOL            xMBPortSerialPutByte( CHAR ucByte );
+BOOL            xMBPortSerialInit(uint8_t ucPort, uint32_t ulBaudRate,
+                                  uint8_t ucDataBits, eMBParity eParity);
+void            vMBPortClose(void);
+void            xMBPortSerialClose(void);
+void            vMBPortSerialEnable(BOOL xRxEnable, BOOL xTxEnable);
+BOOL            xMBPortSerialGetByte(int8_t *pucByte);
+BOOL            xMBPortSerialPutByte(int8_t ucByte);
 
 /* ----------------------- Timers functions ---------------------------------*/
-BOOL            xMBPortTimersInit( USHORT usTimeOut50us );
-
-void            xMBPortTimersClose( void );
-
-void            vMBPortTimersEnable( void );
-
-void            vMBPortTimersDisable( void );
-
-void            vMBPortTimersDelay( USHORT usTimeOutMS );
+BOOL            xMBPortTimersInit(uint16_t usTimeOut50us);
+void            xMBPortTimersClose(void);
+void            vMBPortTimersEnable(void);
+void            vMBPortTimersDisable(void);
+void            vMBPortTimersDelay(uint16_t usTimeOutMS);
 
 /* ----------------------- Callback for the protocol stack ------------------*/
 
@@ -106,22 +94,16 @@ void            vMBPortTimersDelay( USHORT usTimeOutMS );
  *   a new byte was received. The port implementation should wake up the
  *   tasks which are currently blocked on the eventqueue.
  */
-extern          BOOL( *pxMBFrameCBByteReceived ) ( void );
-
-extern          BOOL( *pxMBFrameCBTransmitterEmpty ) ( void );
-
-extern          BOOL( *pxMBPortCBTimerExpired ) ( void );
+extern BOOL     (*pxMBFrameCBByteReceived)(void);
+extern BOOL     (*pxMBFrameCBTransmitterEmpty)(void);
+extern BOOL     (*pxMBPortCBTimerExpired)(void);
 
 /* ----------------------- TCP port functions -------------------------------*/
-BOOL            xMBTCPPortInit( USHORT usTCPPort );
-
-void            vMBTCPPortClose( void );
-
-void            vMBTCPPortDisable( void );
-
-BOOL            xMBTCPPortGetRequest( UCHAR **ppucMBTCPFrame, USHORT * usTCPLength );
-
-BOOL            xMBTCPPortSendResponse( const UCHAR *pucMBTCPFrame, USHORT usTCPLength );
+BOOL            xMBTCPPortInit(uint16_t usTCPPort);
+void            vMBTCPPortClose(void);
+void            vMBTCPPortDisable(void);
+BOOL            xMBTCPPortGetRequest(uint8_t **ppucMBTCPFrame, uint16_t *usTCPLength);
+BOOL            xMBTCPPortSendResponse(const uint8_t *pucMBTCPFrame, uint16_t usTCPLength);
 
 #ifdef __cplusplus
 PR_END_EXTERN_C

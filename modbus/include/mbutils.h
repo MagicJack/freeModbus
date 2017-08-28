@@ -1,4 +1,4 @@
-/* 
+/*
  * FreeModbus Libary: A portable Modbus implementation for Modbus ASCII/RTU.
  * Copyright (c) 2006 Christian Walter <wolti@sil.at>
  * All rights reserved.
@@ -66,17 +66,17 @@ PR_BEGIN_EXTERN_C
  * ucBits[2] = {0, 0};
  *
  * // Set bit 4 to 1 (read: set 1 bit starting at bit offset 4 to value 1)
- * xMBUtilSetBits( ucBits, 4, 1, 1 );
+ * xMBUtilSetBits(ucBits, 4, 1, 1);
  *
  * // Set bit 7 to 1 and bit 8 to 0.
- * xMBUtilSetBits( ucBits, 7, 2, 0x01 );
+ * xMBUtilSetBits(ucBits, 7, 2, 0x01);
  *
  * // Set bits 8 - 11 to 0x05 and bits 12 - 15 to 0x0A;
- * xMBUtilSetBits( ucBits, 8, 8, 0x5A);
+ * xMBUtilSetBits(ucBits, 8, 8, 0x5A);
  * \endcode
  */
-void            xMBUtilSetBits( UCHAR * ucByteBuf, USHORT usBitOffset,
-                                UCHAR ucNBits, UCHAR ucValues );
+void            xMBUtilSetBits(uint8_t *ucByteBuf, uint16_t usBitOffset,
+                               uint8_t ucNBits, uint8_t ucValues);
 
 /*! \brief Function to read bits in a byte buffer.
  *
@@ -90,15 +90,15 @@ void            xMBUtilSetBits( UCHAR * ucByteBuf, USHORT usBitOffset,
  *   than 8.
  *
  * \code
- * UCHAR ucBits[2] = {0, 0};
- * UCHAR ucResult;
+ * uint8_t ucBits[2] = {0, 0};
+ * uint8_t ucResult;
  *
  * // Extract the bits 3 - 10.
- * ucResult = xMBUtilGetBits( ucBits, 3, 8 );
+ * ucResult = xMBUtilGetBits(ucBits, 3, 8);
  * \endcode
  */
-UCHAR           xMBUtilGetBits( UCHAR * ucByteBuf, USHORT usBitOffset,
-                                UCHAR ucNBits );
+uint8_t         xMBUtilGetBits(uint8_t *ucByteBuf, uint16_t usBitOffset,
+                               uint8_t ucNBits);
 
 /*! @} */
 
