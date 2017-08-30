@@ -101,7 +101,7 @@ xMBUtilGetBits(uint8_t *ucByteBuf, uint16_t usBitOffset, uint8_t ucNBits)
     usMask = (uint16_t)((1 << (uint16_t) ucNBits) - 1);
 
     /* copy bits into temporary storage. */
-    usWordBuf = ucByteBuf[usByteOffset];
+    usWordBuf  = ucByteBuf[usByteOffset];
     usWordBuf |= ucByteBuf[usByteOffset + 1] << BITS_UCHAR;
 
     /* throw away unneeded bits. */
@@ -118,8 +118,7 @@ prveMBError2Exception(eMBErrorCode eErrorCode)
 {
     eMBException    eStatus;
 
-    switch (eErrorCode)
-    {
+    switch (eErrorCode) {
         case MB_ENOERR:
             eStatus = MB_EX_NONE;
             break;

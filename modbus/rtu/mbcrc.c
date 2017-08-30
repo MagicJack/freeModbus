@@ -88,8 +88,7 @@ usMBCRC16(uint8_t *pucFrame, uint16_t usLen)
     uint8_t         ucCRCLo = 0xFF;
     int             iIndex;
 
-    while(usLen--)
-    {
+    while (usLen--) {
         iIndex = ucCRCLo ^ *(pucFrame++);
         ucCRCLo = (uint8_t)(ucCRCHi ^ aucCRCHi[iIndex]);
         ucCRCHi = aucCRCLo[iIndex];

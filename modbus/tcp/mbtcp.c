@@ -82,8 +82,7 @@ eMBTCPDoInit(uint16_t ucTCPPort)
 {
     eMBErrorCode    eStatus = MB_ENOERR;
 
-    if(xMBTCPPortInit(ucTCPPort) == FALSE)
-    {
+    if (xMBTCPPortInit(ucTCPPort) == FALSE) {
         eStatus = MB_EPORTERR;
     }
     return eStatus;
@@ -109,13 +108,11 @@ eMBTCPReceive(uint8_t *pucRcvAddress, uint8_t **ppucFrame, uint16_t *pusLength)
     uint16_t        usLength;
     uint16_t        usPID;
 
-    if(xMBTCPPortGetRequest(&pucMBTCPFrame, &usLength) != FALSE)
-    {
+    if (xMBTCPPortGetRequest(&pucMBTCPFrame, &usLength) != FALSE) {
         usPID = pucMBTCPFrame[MB_TCP_PID] << 8U;
         usPID |= pucMBTCPFrame[MB_TCP_PID + 1];
 
-        if(usPID == MB_TCP_PROTOCOL_ID)
-        {
+        if (usPID == MB_TCP_PROTOCOL_ID) {
             *ppucFrame = &pucMBTCPFrame[MB_TCP_FUNC];
             *pusLength = usLength - MB_TCP_FUNC;
             eStatus = MB_ENOERR;
@@ -125,9 +122,7 @@ eMBTCPReceive(uint8_t *pucRcvAddress, uint8_t **ppucFrame, uint16_t *pusLength)
              */
             *pucRcvAddress = MB_TCP_PSEUDO_ADDRESS;
         }
-    }
-    else
-    {
+    } else {
         eStatus = MB_EIO;
     }
     return eStatus;
@@ -148,8 +143,7 @@ eMBTCPSend(uint8_t _unused, const uint8_t *pucFrame, uint16_t usLength)
      */
     pucMBTCPFrame[MB_TCP_LEN]     = (usLength + 1) >> 8U;
     pucMBTCPFrame[MB_TCP_LEN + 1] = (usLength + 1) & 0xFF;
-    if(xMBTCPPortSendResponse(pucMBTCPFrame, usTCPLength) == FALSE)
-    {
+    if (xMBTCPPortSendResponse(pucMBTCPFrame, usTCPLength) == FALSE) {
         eStatus = MB_EIO;
     }
     return eStatus;

@@ -87,21 +87,15 @@ eMBRTUInit(uint8_t ucSlaveAddress, uint8_t ucPort, uint32_t ulBaudRate, eMBParit
     ENTER_CRITICAL_SECTION();
 
     /* Modbus RTU uses 8 Databits. */
-    if(xMBPortSerialInit(ucPort, ulBaudRate, 8, eParity) != TRUE)
-    {
+    if (xMBPortSerialInit(ucPort, ulBaudRate, 8, eParity) != TRUE) {
         eStatus = MB_EPORTERR;
-    }
-    else
-    {
+    } else {
         /* If baudrate > 19200 then we should use the fixed timer values
          * t35 = 1750us. Otherwise t35 must be 3.5 times the character time.
          */
-        if(ulBaudRate > 19200)
-        {
+        if (ulBaudRate > 19200) {
             usTimerT35_50us = 35;       /* 1800us. */
-        }
-        else
-        {
+        } else {
             /* The timer reload value for a character is given by:
              *
              * ChTimeValue = Ticks_per_1s / (Baudrate / 11)
@@ -112,8 +106,7 @@ eMBRTUInit(uint8_t ucSlaveAddress, uint8_t ucPort, uint32_t ulBaudRate, eMBParit
              */
             usTimerT35_50us = (7UL * 220000UL) / (2UL * ulBaudRate);
         }
-        if(xMBPortTimersInit((uint16_t) usTimerT35_50us) != TRUE)
-        {
+        if (xMBPortTimersInit((uint16_t) usTimerT35_50us) != TRUE) {
             eStatus = MB_EPORTERR;
         }
     }
@@ -157,9 +150,8 @@ eMBRTUReceive(uint8_t *pucRcvAddress, uint8_t **pucFrame, uint16_t *pusLength)
     assert(usRcvBufferPos < MB_SER_PDU_SIZE_MAX);
 
     /* Length and CRC check */
-    if((usRcvBufferPos >= MB_SER_PDU_SIZE_MIN)
-        && (usMBCRC16((uint8_t *) ucRTUBuf, usRcvBufferPos) == 0))
-    {
+    if ((usRcvBufferPos >= MB_SER_PDU_SIZE_MIN) &&
+        (usMBCRC16((uint8_t *) ucRTUBuf, usRcvBufferPos) == 0)) {
         /* Save the address field. All frames are passed to the upper layed
          * and the decision if a frame is used is done there.
          */
@@ -173,9 +165,7 @@ eMBRTUReceive(uint8_t *pucRcvAddress, uint8_t **pucFrame, uint16_t *pusLength)
         /* Return the start of the Modbus PDU to the caller. */
         *pucFrame = (uint8_t *) &ucRTUBuf[MB_SER_PDU_PDU_OFF];
         xFrameReceived = TRUE;
-    }
-    else
-    {
+    } else {
         eStatus = MB_EIO;
     }
 
@@ -195,8 +185,7 @@ eMBRTUSend(uint8_t ucSlaveAddress, const uint8_t *pucFrame, uint16_t usLength)
      * slow with processing the received frame and the master sent another
      * frame on the network. We have to abort sending the frame.
      */
-    if(eRcvState == STATE_RX_IDLE)
-    {
+    if (eRcvState == STATE_RX_IDLE) {
         /* First byte before the Modbus-PDU is the slave address. */
         pucSndBufferCur = (uint8_t *) pucFrame - 1;
         usSndBufferCount = 1;
@@ -213,9 +202,7 @@ eMBRTUSend(uint8_t ucSlaveAddress, const uint8_t *pucFrame, uint16_t usLength)
         /* Activate the transmitter. */
         eSndState = STATE_TX_XMIT;
         vMBPortSerialEnable(FALSE, TRUE);
-    }
-    else
-    {
+    } else {
         eStatus = MB_EIO;
     }
     EXIT_CRITICAL_SECTION();
@@ -233,8 +220,7 @@ xMBRTUReceiveFSM(void)
     /* Always read the character. */
     (void)xMBPortSerialGetByte((int8_t *) &ucByte);
 
-    switch (eRcvState)
-    {
+    switch (eRcvState) {
         /* If we have received a character in the init state we have to
          * wait until the frame is finished.
          */
@@ -268,12 +254,9 @@ xMBRTUReceiveFSM(void)
          * ignored.
          */
     case STATE_RX_RCV:
-        if(usRcvBufferPos < MB_SER_PDU_SIZE_MAX)
-        {
+        if (usRcvBufferPos < MB_SER_PDU_SIZE_MAX) {
             ucRTUBuf[usRcvBufferPos++] = ucByte;
-        }
-        else
-        {
+        } else {
             eRcvState = STATE_RX_ERROR;
         }
         vMBPortTimersEnable();
@@ -289,8 +272,7 @@ xMBRTUTransmitFSM(void)
 
     assert(eRcvState == STATE_RX_IDLE);
 
-    switch (eSndState)
-    {
+    switch (eSndState) {
         /* We should not get a transmitter event if the transmitter is in
          * idle state.  */
     case STATE_TX_IDLE:
@@ -300,14 +282,11 @@ xMBRTUTransmitFSM(void)
 
     case STATE_TX_XMIT:
         /* check if we are finished. */
-        if(usSndBufferCount != 0)
-        {
+        if (usSndBufferCount != 0) {
             xMBPortSerialPutByte((int8_t)*pucSndBufferCur);
             pucSndBufferCur++;  /* next byte in sendbuffer. */
             usSndBufferCount--;
-        }
-        else
-        {
+        } else {
             xNeedPoll = xMBPortEventPost(EV_FRAME_SENT);
             /* Disable transmitter. This prevents another transmit buffer
              * empty interrupt. */
@@ -325,8 +304,7 @@ xMBRTUTimerT35Expired(void)
 {
     BOOL            xNeedPoll = FALSE;
 
-    switch (eRcvState)
-    {
+    switch (eRcvState) {
         /* Timer t35 expired. Startup phase is finished. */
     case STATE_RX_INIT:
         xNeedPoll = xMBPortEventPost(EV_READY);
