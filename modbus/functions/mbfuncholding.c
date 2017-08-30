@@ -1,4 +1,4 @@
-/* 
+/*
  * FreeModbus Libary: A portable Modbus implementation for Modbus ASCII/RTU.
  * Copyright (c) 2006 Christian Walter <wolti@sil.at>
  * All rights reserved.
@@ -56,7 +56,7 @@
 #define MB_PDU_FUNC_WRITE_MUL_BYTECNT_OFF       ( MB_PDU_DATA_OFF + 4 )
 #define MB_PDU_FUNC_WRITE_MUL_VALUES_OFF        ( MB_PDU_DATA_OFF + 5 )
 #define MB_PDU_FUNC_WRITE_MUL_SIZE_MIN          ( 5 )
-#define MB_PDU_FUNC_WRITE_MUL_REGCNT_MAX        ( 0x0078 )
+#define MB_PDU_FUNC_WRITE_MUL_REGCNT_MAX        ( 0x007B )
 
 #define MB_PDU_FUNC_READWRITE_READ_ADDR_OFF     ( MB_PDU_DATA_OFF + 0 )
 #define MB_PDU_FUNC_READWRITE_READ_REGCNT_OFF   ( MB_PDU_DATA_OFF + 2 )
@@ -116,7 +116,7 @@ eMBFuncWriteMultipleHoldingRegister( UCHAR * pucFrame, USHORT * usLen )
     eMBException    eStatus = MB_EX_NONE;
     eMBErrorCode    eRegStatus;
 
-    if( *usLen >= ( MB_PDU_FUNC_WRITE_MUL_SIZE_MIN + MB_PDU_SIZE_MIN ) )
+    if( *usLen > ( MB_PDU_FUNC_WRITE_MUL_SIZE_MIN + MB_PDU_SIZE_MIN ) )
     {
         usRegAddress = ( USHORT )( pucFrame[MB_PDU_FUNC_WRITE_MUL_ADDR_OFF] << 8 );
         usRegAddress |= ( USHORT )( pucFrame[MB_PDU_FUNC_WRITE_MUL_ADDR_OFF + 1] );
@@ -186,7 +186,7 @@ eMBFuncReadHoldingRegister( UCHAR * pucFrame, USHORT * usLen )
         usRegCount |= ( USHORT )( pucFrame[MB_PDU_FUNC_READ_REGCNT_OFF + 1] );
 
         /* Check if the number of registers to read is valid. If not
-         * return Modbus illegal data value exception. 
+         * return Modbus illegal data value exception.
          */
         if( ( usRegCount >= 1 ) && ( usRegCount <= MB_PDU_FUNC_READ_REGCNT_MAX ) )
         {
@@ -244,7 +244,7 @@ eMBFuncReadWriteMultipleHoldingRegister( UCHAR * pucFrame, USHORT * usLen )
     eMBException    eStatus = MB_EX_NONE;
     eMBErrorCode    eRegStatus;
 
-    if( *usLen >= ( MB_PDU_FUNC_READWRITE_SIZE_MIN + MB_PDU_SIZE_MIN ) )
+    if( *usLen > ( MB_PDU_FUNC_READWRITE_SIZE_MIN + MB_PDU_SIZE_MIN ) )
     {
         usRegReadAddress = ( USHORT )( pucFrame[MB_PDU_FUNC_READWRITE_READ_ADDR_OFF] << 8U );
         usRegReadAddress |= ( USHORT )( pucFrame[MB_PDU_FUNC_READWRITE_READ_ADDR_OFF + 1] );

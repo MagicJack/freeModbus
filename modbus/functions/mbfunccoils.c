@@ -209,7 +209,7 @@ eMBFuncWriteMultipleCoils( UCHAR * pucFrame, USHORT * usLen )
     eMBException    eStatus = MB_EX_NONE;
     eMBErrorCode    eRegStatus;
 
-    if( *usLen > ( MB_PDU_FUNC_WRITE_SIZE + MB_PDU_SIZE_MIN ) )
+    if( *usLen > ( MB_PDU_FUNC_WRITE_MUL_SIZE_MIN + MB_PDU_SIZE_MIN ) )
     {
         usRegAddress = ( USHORT )( pucFrame[MB_PDU_FUNC_WRITE_MUL_ADDR_OFF] << 8 );
         usRegAddress |= ( USHORT )( pucFrame[MB_PDU_FUNC_WRITE_MUL_ADDR_OFF + 1] );

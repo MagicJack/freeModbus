@@ -43,7 +43,7 @@ eMBException    prveMBError2Exception( eMBErrorCode eErrorCode );
 
 /* ----------------------- Start implementation -----------------------------*/
 
-#if MB_FUNC_READ_COILS_ENABLED > 0
+#if MB_FUNC_READ_DISCRETE_INPUTS_ENABLED > 0
 
 eMBException
 eMBFuncReadDiscreteInputs( UCHAR * pucFrame, USHORT * usLen )
@@ -66,7 +66,7 @@ eMBFuncReadDiscreteInputs( UCHAR * pucFrame, USHORT * usLen )
         usDiscreteCnt |= ( USHORT )( pucFrame[MB_PDU_FUNC_READ_DISCCNT_OFF + 1] );
 
         /* Check if the number of registers to read is valid. If not
-         * return Modbus illegal data value exception. 
+         * return Modbus illegal data value exception.
          */
         if( ( usDiscreteCnt >= 1 ) &&
             ( usDiscreteCnt <= MB_PDU_FUNC_READ_DISCCNT_MAX ) )
@@ -103,7 +103,7 @@ eMBFuncReadDiscreteInputs( UCHAR * pucFrame, USHORT * usLen )
             else
             {
                 /* The response contains the function code, the starting address
-                 * and the quantity of registers. We reuse the old values in the 
+                 * and the quantity of registers. We reuse the old values in the
                  * buffer because they are still valid. */
                 *usLen += ucNBytes;;
             }
