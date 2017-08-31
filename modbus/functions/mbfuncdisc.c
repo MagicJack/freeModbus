@@ -77,7 +77,7 @@ eMBFuncReadDiscreteInputs(uint8_t *pucFrame, uint16_t *usLen)
     /* Check if the number of registers to read is valid. If not
      * return Modbus illegal data value exception.
      */
-    if ((usDiscreteCnt < 1) ||
+    if ((usDiscreteCnt == 0) ||
         (usDiscreteCnt > MB_PDU_FUNC_READ_DISCCNT_MAX))
         return MB_EX_ILLEGAL_DATA_VALUE;
 

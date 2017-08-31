@@ -88,7 +88,7 @@ eMBFuncReadCoils(uint8_t *pucFrame, uint16_t *usLen)
     /* Check if the number of registers to read is valid. If not
      * return Modbus illegal data value exception.
      */
-    if ((usCoilCount < 1) ||
+    if ((usCoilCount == 0) ||
         (usCoilCount > MB_PDU_FUNC_READ_COILCNT_MAX))
         return MB_EX_ILLEGAL_DATA_VALUE;
 
@@ -200,7 +200,7 @@ eMBFuncWriteMultipleCoils(uint8_t *pucFrame, uint16_t *usLen)
         ucByteCountVerify = (uint8_t)(usCoilCnt / 8);
     }
 
-    if ((usCoilCnt < 1) ||
+    if ((usCoilCnt == 0) ||
         (usCoilCnt > MB_PDU_FUNC_WRITE_MUL_COILCNT_MAX) ||
         (ucByteCountVerify != ucByteCount))
         return MB_EX_ILLEGAL_DATA_VALUE;

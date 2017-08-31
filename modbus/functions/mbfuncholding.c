@@ -123,7 +123,7 @@ eMBFuncWriteMultipleHoldingRegister(uint8_t *pucFrame, uint16_t *usLen)
 
     ucRegByteCount = pucFrame[MB_PDU_FUNC_WRITE_MUL_BYTECNT_OFF];
 
-    if ((usRegCount < 1) ||
+    if ((usRegCount == 0) ||
         (usRegCount > MB_PDU_FUNC_WRITE_MUL_REGCNT_MAX) ||
         (ucRegByteCount != (uint8_t)(2 * usRegCount)))
         return MB_EX_ILLEGAL_DATA_VALUE;
@@ -171,7 +171,7 @@ eMBFuncReadHoldingRegister(uint8_t *pucFrame, uint16_t *usLen)
     /* Check if the number of registers to read is valid. If not
      * return Modbus illegal data value exception.
      */
-    if ((usRegCount < 1) ||
+    if ((usRegCount == 0) ||
         (usRegCount > MB_PDU_FUNC_READ_REGCNT_MAX))
         return MB_EX_ILLEGAL_DATA_VALUE;
 
@@ -235,8 +235,8 @@ eMBFuncReadWriteMultipleHoldingRegister(uint8_t *pucFrame, uint16_t *usLen)
 
     ucRegWriteByteCount = pucFrame[MB_PDU_FUNC_READWRITE_BYTECNT_OFF];
 
-    if ((usRegReadCount  < 1) || (usRegReadCount  > 0x7D) ||
-        (usRegWriteCount < 1) || (usRegWriteCount > 0x79) ||
+    if ((usRegReadCount  == 0) || (usRegReadCount  > 0x7D) ||
+        (usRegWriteCount == 0) || (usRegWriteCount > 0x79) ||
         ((2 * usRegWriteCount) != ucRegWriteByteCount))
         return MB_EX_ILLEGAL_DATA_VALUE;
 
