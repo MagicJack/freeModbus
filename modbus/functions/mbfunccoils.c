@@ -104,11 +104,8 @@ eMBFuncReadCoils(uint8_t *pucFrame, uint16_t *usLen)
     /* Test if the quantity of coils is a multiple of 8. If not last
      * byte is only partially field with unused coils set to zero.
      */
-    if ((usCoilCount & 0x0007) != 0) {
-        ucNBytes = (uint8_t)(usCoilCount / 8 + 1);
-    } else {
-        ucNBytes = (uint8_t)(usCoilCount / 8);
-    }
+    ucNBytes = (uint8_t)(usCoilCount/8) + (usCoilCount%8 != 0);
+
     *pucFrameCur++ = ucNBytes;
     *usLen += 1;
 
@@ -150,12 +147,9 @@ eMBFuncWriteCoil(uint8_t *pucFrame, uint16_t *usLen)
          (pucFrame[MB_PDU_FUNC_WRITE_VALUE_OFF + 1] != 0x00))
         return MB_EX_ILLEGAL_DATA_VALUE;
 
+    ucBuf[0] = (pucFrame[MB_PDU_FUNC_WRITE_VALUE_OFF] == 0xFF);
     ucBuf[1] = 0;
-    if (pucFrame[MB_PDU_FUNC_WRITE_VALUE_OFF] == 0xFF) {
-        ucBuf[0] = 1;
-    } else {
-        ucBuf[0] = 0;
-    }
+
     eRegStatus =
         eMBRegCoilsCB(&ucBuf[0], usRegAddress, 1, MB_REG_WRITE);
 
@@ -194,11 +188,7 @@ eMBFuncWriteMultipleCoils(uint8_t *pucFrame, uint16_t *usLen)
     ucByteCount = pucFrame[MB_PDU_FUNC_WRITE_MUL_BYTECNT_OFF];
 
     /* Compute the number of expected bytes in the request. */
-    if ((usCoilCnt & 0x0007) != 0) {
-        ucByteCountVerify = (uint8_t)(usCoilCnt / 8 + 1);
-    } else {
-        ucByteCountVerify = (uint8_t)(usCoilCnt / 8);
-    }
+    ucByteCountVerify = (uint8_t)(usCoilCnt/8) + (usCoilCnt%8 != 0);
 
     if ((usCoilCnt == 0) ||
         (usCoilCnt > MB_PDU_FUNC_WRITE_MUL_COILCNT_MAX) ||

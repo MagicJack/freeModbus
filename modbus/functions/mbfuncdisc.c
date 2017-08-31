@@ -93,11 +93,8 @@ eMBFuncReadDiscreteInputs(uint8_t *pucFrame, uint16_t *usLen)
     /* Test if the quantity of coils is a multiple of 8. If not last
      * byte is only partially field with unused coils set to zero.
      */
-    if ((usDiscreteCnt & 0x0007) != 0) {
-        ucNBytes = (uint8_t)(usDiscreteCnt / 8 + 1);
-    } else {
-        ucNBytes = (uint8_t)(usDiscreteCnt / 8);
-    }
+    ucNBytes = (uint8_t)(usDiscreteCnt/8) + (usDiscreteCnt%8 != 0);
+
     *pucFrameCur++ = ucNBytes;
     *usLen += 1;
 
