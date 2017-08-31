@@ -65,6 +65,7 @@
 #define MB_PDU_FUNC_READWRITE_BYTECNT_OFF       ( MB_PDU_DATA_OFF + 8 )
 #define MB_PDU_FUNC_READWRITE_WRITE_VALUES_OFF  ( MB_PDU_DATA_OFF + 9 )
 #define MB_PDU_FUNC_READWRITE_SIZE_MIN          ( 9 )
+#define MB_PDU_FUNC_READWRITE_REGCNT_MAX        ( 0x0079 )
 
 /* ----------------------- Static functions ---------------------------------*/
 eMBException    prveMBError2Exception( eMBErrorCode eErrorCode );
@@ -262,8 +263,8 @@ eMBFuncReadWriteMultipleHoldingRegister( UCHAR * pucFrame, USHORT * usLen )
 
         ucRegWriteByteCount = pucFrame[MB_PDU_FUNC_READWRITE_BYTECNT_OFF];
 
-        if( ( usRegReadCount >= 1 ) && ( usRegReadCount <= 0x7D ) &&
-            ( usRegWriteCount >= 1 ) && ( usRegWriteCount <= 0x79 ) &&
+        if( ( usRegReadCount >= 1 ) && ( usRegReadCount <= MB_PDU_FUNC_READ_REGCNT_MAX ) &&
+            ( usRegWriteCount >= 1 ) && ( usRegWriteCount <= MB_PDU_FUNC_READWRITE_REGCNT_MAX ) &&
             ( ( 2 * usRegWriteCount ) == ucRegWriteByteCount ) )
         {
             /* Make callback to update the register values. */
