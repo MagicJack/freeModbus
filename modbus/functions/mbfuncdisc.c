@@ -1,21 +1,32 @@
- /*
-  * FreeRTOS Modbus Libary: A Modbus serial implementation for FreeRTOS
-  * Copyright (C) 2006 Christian Walter <wolti@sil.at>
-  *
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-  * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this library; if not, write to the Free Software
-  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-  */
+/*
+ * FreeModbus Libary: A portable Modbus implementation for Modbus ASCII/RTU.
+ * Copyright (c) 2006 Christian Walter <wolti@sil.at>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * File: $Id: mbfuncdisc.c,v 1.8 2007/02/18 23:47:16 wolti Exp $
+ */
 
 /* ----------------------- System includes ----------------------------------*/
 #include "stdlib.h"
@@ -49,62 +60,59 @@ eMBFuncReadDiscreteInputs(uint8_t *pucFrame, uint16_t *usLen)
     uint16_t        usDiscreteCnt;
     uint8_t         ucNBytes;
     uint8_t        *pucFrameCur;
-
-    eMBException    eStatus = MB_EX_NONE;
     eMBErrorCode    eRegStatus;
 
-    if (*usLen == (MB_PDU_FUNC_READ_SIZE + MB_PDU_SIZE_MIN)) {
-        usRegAddress  = (uint16_t)(pucFrame[MB_PDU_FUNC_READ_ADDR_OFF] << 8);
-        usRegAddress |= (uint16_t)(pucFrame[MB_PDU_FUNC_READ_ADDR_OFF + 1]);
-        usRegAddress++;
+    /* Can't be a valid read coil register request because the length
+     * is incorrect. */
+    if (*usLen != (MB_PDU_FUNC_READ_SIZE + MB_PDU_SIZE_MIN))
+        return MB_EX_ILLEGAL_DATA_VALUE;
 
-        usDiscreteCnt  = (uint16_t)(pucFrame[MB_PDU_FUNC_READ_DISCCNT_OFF] << 8);
-        usDiscreteCnt |= (uint16_t)(pucFrame[MB_PDU_FUNC_READ_DISCCNT_OFF + 1]);
+    usRegAddress  = (uint16_t)(pucFrame[MB_PDU_FUNC_READ_ADDR_OFF] << 8);
+    usRegAddress |= (uint16_t)(pucFrame[MB_PDU_FUNC_READ_ADDR_OFF + 1]);
+    usRegAddress++;
 
-        /* Check if the number of registers to read is valid. If not
-         * return Modbus illegal data value exception.
-         */
-        if ((usDiscreteCnt >= 1) &&
-            (usDiscreteCnt <= MB_PDU_FUNC_READ_DISCCNT_MAX)) {
-            /* Set the current PDU data pointer to the beginning. */
-            pucFrameCur = &pucFrame[MB_PDU_FUNC_OFF];
-            *usLen = MB_PDU_FUNC_OFF;
+    usDiscreteCnt  = (uint16_t)(pucFrame[MB_PDU_FUNC_READ_DISCCNT_OFF] << 8);
+    usDiscreteCnt |= (uint16_t)(pucFrame[MB_PDU_FUNC_READ_DISCCNT_OFF + 1]);
 
-            /* First byte contains the function code. */
-            *pucFrameCur++ = MB_FUNC_READ_DISCRETE_INPUTS;
-            *usLen += 1;
+    /* Check if the number of registers to read is valid. If not
+     * return Modbus illegal data value exception.
+     */
+    if ((usDiscreteCnt < 1) ||
+        (usDiscreteCnt > MB_PDU_FUNC_READ_DISCCNT_MAX))
+        return MB_EX_ILLEGAL_DATA_VALUE;
 
-            /* Test if the quantity of coils is a multiple of 8. If not last
-             * byte is only partially field with unused coils set to zero. */
-            if ((usDiscreteCnt & 0x0007) != 0) {
-                ucNBytes = (uint8_t)(usDiscreteCnt / 8 + 1);
-            } else {
-                ucNBytes = (uint8_t)(usDiscreteCnt / 8);
-            }
-            *pucFrameCur++ = ucNBytes;
-            *usLen += 1;
 
-            eRegStatus =
-                eMBRegDiscreteCB(pucFrameCur, usRegAddress, usDiscreteCnt);
+    /* Set the current PDU data pointer to the beginning. */
+    pucFrameCur = &pucFrame[MB_PDU_FUNC_OFF];
+    *usLen = MB_PDU_FUNC_OFF;
 
-            /* If an error occured convert it into a Modbus exception. */
-            if (eRegStatus != MB_ENOERR) {
-                eStatus = prveMBError2Exception(eRegStatus);
-            } else {
-                /* The response contains the function code, the starting address
-                 * and the quantity of registers. We reuse the old values in the
-                 * buffer because they are still valid. */
-                *usLen += ucNBytes;;
-            }
-        } else {
-            eStatus = MB_EX_ILLEGAL_DATA_VALUE;
-        }
+    /* First byte contains the function code. */
+    *pucFrameCur++ = MB_FUNC_READ_DISCRETE_INPUTS;
+    *usLen += 1;
+
+    /* Test if the quantity of coils is a multiple of 8. If not last
+     * byte is only partially field with unused coils set to zero.
+     */
+    if ((usDiscreteCnt & 0x0007) != 0) {
+        ucNBytes = (uint8_t)(usDiscreteCnt / 8 + 1);
     } else {
-        /* Can't be a valid read coil register request because the length
-         * is incorrect. */
-        eStatus = MB_EX_ILLEGAL_DATA_VALUE;
+        ucNBytes = (uint8_t)(usDiscreteCnt / 8);
     }
-    return eStatus;
+    *pucFrameCur++ = ucNBytes;
+    *usLen += 1;
+
+    eRegStatus =
+        eMBRegDiscreteCB(pucFrameCur, usRegAddress, usDiscreteCnt);
+
+    /* If an error occured convert it into a Modbus exception. */
+    if (eRegStatus != MB_ENOERR)
+        return prveMBError2Exception(eRegStatus);
+
+    /* The response contains the function code, the starting address
+     * and the quantity of registers. We reuse the old values in the
+     * buffer because they are still valid. */
+    *usLen += ucNBytes;
+     return MB_EX_NONE;
 }
 
 #endif

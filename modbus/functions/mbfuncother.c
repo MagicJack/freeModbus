@@ -53,8 +53,6 @@ eMBErrorCode
 eMBSetSlaveID(uint8_t ucSlaveID, BOOL xIsRunning,
               uint8_t const *pucAdditional, uint16_t usAdditionalLen)
 {
-    eMBErrorCode    eStatus = MB_ENOERR;
-
     /* the first byte and second byte in the buffer is reserved for
      * the parameter ucSlaveID and the running flag. The rest of
      * the buffer is available for additional data. */
@@ -67,10 +65,9 @@ eMBSetSlaveID(uint8_t ucSlaveID, BOOL xIsRunning,
                    (size_t)usAdditionalLen);
             usMBSlaveIDLen += usAdditionalLen;
         }
-    } else {
-        eStatus = MB_ENORES;
+        return MB_ENOERR;
     }
-    return eStatus;
+    return MB_ENORES;
 }
 
 eMBException

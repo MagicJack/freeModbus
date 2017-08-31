@@ -76,28 +76,26 @@ eMBException
 eMBFuncWriteHoldingRegister(uint8_t *pucFrame, uint16_t *usLen)
 {
     uint16_t        usRegAddress;
-    eMBException    eStatus = MB_EX_NONE;
     eMBErrorCode    eRegStatus;
 
-    if (*usLen == (MB_PDU_FUNC_WRITE_SIZE + MB_PDU_SIZE_MIN)) {
-        usRegAddress  = (uint16_t)(pucFrame[MB_PDU_FUNC_WRITE_ADDR_OFF] << 8);
-        usRegAddress |= (uint16_t)(pucFrame[MB_PDU_FUNC_WRITE_ADDR_OFF + 1]);
-        usRegAddress++;
+    /* Can't be a valid request because the length is incorrect. */
+    if (*usLen != (MB_PDU_FUNC_WRITE_SIZE + MB_PDU_SIZE_MIN))
+        return MB_EX_ILLEGAL_DATA_VALUE;
 
-        /* Make callback to update the value. */
-        eRegStatus =
-            eMBRegHoldingCB(&pucFrame[MB_PDU_FUNC_WRITE_VALUE_OFF],
-                            usRegAddress, 1, MB_REG_WRITE);
+    usRegAddress  = (uint16_t)(pucFrame[MB_PDU_FUNC_WRITE_ADDR_OFF] << 8);
+    usRegAddress |= (uint16_t)(pucFrame[MB_PDU_FUNC_WRITE_ADDR_OFF + 1]);
+    usRegAddress++;
 
-        /* If an error occured convert it into a Modbus exception. */
-        if (eRegStatus != MB_ENOERR) {
-            eStatus = prveMBError2Exception(eRegStatus);
-        }
-    } else {
-        /* Can't be a valid request because the length is incorrect. */
-        eStatus = MB_EX_ILLEGAL_DATA_VALUE;
-    }
-    return eStatus;
+    /* Make callback to update the value. */
+    eRegStatus =
+        eMBRegHoldingCB(&pucFrame[MB_PDU_FUNC_WRITE_VALUE_OFF],
+                        usRegAddress, 1, MB_REG_WRITE);
+
+    /* If an error occured convert it into a Modbus exception. */
+    if (eRegStatus != MB_ENOERR)
+        return prveMBError2Exception(eRegStatus);
+
+    return MB_EX_NONE;
 }
 
 #endif
@@ -110,46 +108,41 @@ eMBFuncWriteMultipleHoldingRegister(uint8_t *pucFrame, uint16_t *usLen)
     uint16_t        usRegAddress;
     uint16_t        usRegCount;
     uint8_t         ucRegByteCount;
-
-    eMBException    eStatus = MB_EX_NONE;
     eMBErrorCode    eRegStatus;
 
-    if (*usLen > (MB_PDU_FUNC_WRITE_MUL_SIZE_MIN + MB_PDU_SIZE_MIN)) {
-        usRegAddress  = (uint16_t)(pucFrame[MB_PDU_FUNC_WRITE_MUL_ADDR_OFF] << 8);
-        usRegAddress |= (uint16_t)(pucFrame[MB_PDU_FUNC_WRITE_MUL_ADDR_OFF + 1]);
-        usRegAddress++;
+    /* Can't be a valid request because the length is incorrect. */
+    if (*usLen <= (MB_PDU_FUNC_WRITE_MUL_SIZE_MIN + MB_PDU_SIZE_MIN))
+        return MB_EX_ILLEGAL_DATA_VALUE;
 
-        usRegCount  = (uint16_t)(pucFrame[MB_PDU_FUNC_WRITE_MUL_REGCNT_OFF] << 8);
-        usRegCount |= (uint16_t)(pucFrame[MB_PDU_FUNC_WRITE_MUL_REGCNT_OFF + 1]);
+    usRegAddress  = (uint16_t)(pucFrame[MB_PDU_FUNC_WRITE_MUL_ADDR_OFF] << 8);
+    usRegAddress |= (uint16_t)(pucFrame[MB_PDU_FUNC_WRITE_MUL_ADDR_OFF + 1]);
+    usRegAddress++;
 
-        ucRegByteCount = pucFrame[MB_PDU_FUNC_WRITE_MUL_BYTECNT_OFF];
+    usRegCount  = (uint16_t)(pucFrame[MB_PDU_FUNC_WRITE_MUL_REGCNT_OFF] << 8);
+    usRegCount |= (uint16_t)(pucFrame[MB_PDU_FUNC_WRITE_MUL_REGCNT_OFF + 1]);
 
-        if ((usRegCount >= 1) &&
-            (usRegCount <= MB_PDU_FUNC_WRITE_MUL_REGCNT_MAX) &&
-            (ucRegByteCount == (uint8_t)(2 * usRegCount))) {
-            /* Make callback to update the register values. */
-            eRegStatus =
-                eMBRegHoldingCB(&pucFrame[MB_PDU_FUNC_WRITE_MUL_VALUES_OFF],
-                                usRegAddress, usRegCount, MB_REG_WRITE);
+    ucRegByteCount = pucFrame[MB_PDU_FUNC_WRITE_MUL_BYTECNT_OFF];
 
-            /* If an error occured convert it into a Modbus exception. */
-            if (eRegStatus != MB_ENOERR) {
-                eStatus = prveMBError2Exception(eRegStatus);
-            } else {
-                /* The response contains the function code, the starting
-                 * address and the quantity of registers. We reuse the
-                 * old values in the buffer because they are still valid.
-                 */
-                *usLen = MB_PDU_FUNC_WRITE_MUL_BYTECNT_OFF;
-            }
-        } else {
-            eStatus = MB_EX_ILLEGAL_DATA_VALUE;
-        }
-    } else {
-        /* Can't be a valid request because the length is incorrect. */
-        eStatus = MB_EX_ILLEGAL_DATA_VALUE;
-    }
-    return eStatus;
+    if ((usRegCount < 1) ||
+        (usRegCount > MB_PDU_FUNC_WRITE_MUL_REGCNT_MAX) ||
+        (ucRegByteCount != (uint8_t)(2 * usRegCount)))
+        return MB_EX_ILLEGAL_DATA_VALUE;
+
+    /* Make callback to update the register values. */
+    eRegStatus =
+        eMBRegHoldingCB(&pucFrame[MB_PDU_FUNC_WRITE_MUL_VALUES_OFF],
+                        usRegAddress, usRegCount, MB_REG_WRITE);
+
+    /* If an error occured convert it into a Modbus exception. */
+    if (eRegStatus != MB_ENOERR)
+        return prveMBError2Exception(eRegStatus);
+
+    /* The response contains the function code, the starting
+     * address and the quantity of registers. We reuse the
+     * old values in the buffer because they are still valid.
+     */
+    *usLen = MB_PDU_FUNC_WRITE_MUL_BYTECNT_OFF;
+    return MB_EX_NONE;
 }
 
 #endif
@@ -162,53 +155,49 @@ eMBFuncReadHoldingRegister(uint8_t *pucFrame, uint16_t *usLen)
     uint16_t        usRegAddress;
     uint16_t        usRegCount;
     uint8_t        *pucFrameCur;
-
-    eMBException    eStatus = MB_EX_NONE;
     eMBErrorCode    eRegStatus;
 
-    if (*usLen == (MB_PDU_FUNC_READ_SIZE + MB_PDU_SIZE_MIN)) {
-        usRegAddress  = (uint16_t)(pucFrame[MB_PDU_FUNC_READ_ADDR_OFF] << 8);
-        usRegAddress |= (uint16_t)(pucFrame[MB_PDU_FUNC_READ_ADDR_OFF + 1]);
-        usRegAddress++;
+    /* Can't be a valid request because the length is incorrect. */
+    if (*usLen != (MB_PDU_FUNC_READ_SIZE + MB_PDU_SIZE_MIN))
+        return MB_EX_ILLEGAL_DATA_VALUE;
 
-        usRegCount  = (uint16_t)(pucFrame[MB_PDU_FUNC_READ_REGCNT_OFF] << 8);
-        usRegCount |= (uint16_t)(pucFrame[MB_PDU_FUNC_READ_REGCNT_OFF + 1]);
+    usRegAddress  = (uint16_t)(pucFrame[MB_PDU_FUNC_READ_ADDR_OFF] << 8);
+    usRegAddress |= (uint16_t)(pucFrame[MB_PDU_FUNC_READ_ADDR_OFF + 1]);
+    usRegAddress++;
 
-        /* Check if the number of registers to read is valid. If not
-         * return Modbus illegal data value exception.
-         */
-        if ((usRegCount >= 1) &&
-            (usRegCount <= MB_PDU_FUNC_READ_REGCNT_MAX)) {
-            /* Set the current PDU data pointer to the beginning. */
-            pucFrameCur = &pucFrame[MB_PDU_FUNC_OFF];
-            *usLen = MB_PDU_FUNC_OFF;
+    usRegCount  = (uint16_t)(pucFrame[MB_PDU_FUNC_READ_REGCNT_OFF] << 8);
+    usRegCount |= (uint16_t)(pucFrame[MB_PDU_FUNC_READ_REGCNT_OFF + 1]);
 
-            /* First byte contains the function code. */
-            *pucFrameCur++ = MB_FUNC_READ_HOLDING_REGISTER;
-            *usLen += 1;
+    /* Check if the number of registers to read is valid. If not
+     * return Modbus illegal data value exception.
+     */
+    if ((usRegCount < 1) ||
+        (usRegCount > MB_PDU_FUNC_READ_REGCNT_MAX))
+        return MB_EX_ILLEGAL_DATA_VALUE;
 
-            /* Second byte in the response contain the number of bytes. */
-            *pucFrameCur++ = (uint8_t)(usRegCount * 2);
-            *usLen += 1;
 
-            /* Make callback to fill the buffer. */
-            eRegStatus =
-                eMBRegHoldingCB(pucFrameCur, usRegAddress, usRegCount, MB_REG_READ);
+    /* Set the current PDU data pointer to the beginning. */
+    pucFrameCur = &pucFrame[MB_PDU_FUNC_OFF];
+    *usLen = MB_PDU_FUNC_OFF;
 
-            /* If an error occured convert it into a Modbus exception. */
-            if (eRegStatus != MB_ENOERR) {
-                eStatus = prveMBError2Exception(eRegStatus);
-            } else {
-                *usLen += usRegCount * 2;
-            }
-        } else {
-            eStatus = MB_EX_ILLEGAL_DATA_VALUE;
-        }
-    } else {
-        /* Can't be a valid request because the length is incorrect. */
-        eStatus = MB_EX_ILLEGAL_DATA_VALUE;
-    }
-    return eStatus;
+    /* First byte contains the function code. */
+    *pucFrameCur++ = MB_FUNC_READ_HOLDING_REGISTER;
+    *usLen += 1;
+
+    /* Second byte in the response contain the number of bytes. */
+    *pucFrameCur++ = (uint8_t)(usRegCount * 2);
+    *usLen += 1;
+
+    /* Make callback to fill the buffer. */
+    eRegStatus =
+        eMBRegHoldingCB(pucFrameCur, usRegAddress, usRegCount, MB_REG_READ);
+
+    /* If an error occured convert it into a Modbus exception. */
+    if (eRegStatus != MB_ENOERR)
+        return prveMBError2Exception(eRegStatus);
+
+    *usLen += usRegCount * 2;
+    return MB_EX_NONE;
 }
 
 #endif
@@ -225,62 +214,61 @@ eMBFuncReadWriteMultipleHoldingRegister(uint8_t *pucFrame, uint16_t *usLen)
     uint8_t         ucRegWriteByteCount;
     uint8_t        *pucFrameCur;
 
-    eMBException    eStatus = MB_EX_NONE;
     eMBErrorCode    eRegStatus;
 
-    if (*usLen > (MB_PDU_FUNC_READWRITE_SIZE_MIN + MB_PDU_SIZE_MIN)) {
-        usRegReadAddress  = (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_READ_ADDR_OFF] << 8U);
-        usRegReadAddress |= (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_READ_ADDR_OFF + 1]);
-        usRegReadAddress++;
+    if (*usLen <= (MB_PDU_FUNC_READWRITE_SIZE_MIN + MB_PDU_SIZE_MIN))
+        return MB_EX_ILLEGAL_DATA_VALUE;
 
-        usRegReadCount  = (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_READ_REGCNT_OFF] << 8U);
-        usRegReadCount |= (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_READ_REGCNT_OFF + 1]);
+    usRegReadAddress  = (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_READ_ADDR_OFF] << 8U);
+    usRegReadAddress |= (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_READ_ADDR_OFF + 1]);
+    usRegReadAddress++;
 
-        usRegWriteAddress  = (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_WRITE_ADDR_OFF] << 8U);
-        usRegWriteAddress |= (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_WRITE_ADDR_OFF + 1]);
-        usRegWriteAddress++;
+    usRegReadCount  = (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_READ_REGCNT_OFF] << 8U);
+    usRegReadCount |= (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_READ_REGCNT_OFF + 1]);
 
-        usRegWriteCount  = (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_WRITE_REGCNT_OFF] << 8U);
-        usRegWriteCount |= (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_WRITE_REGCNT_OFF + 1]);
+    usRegWriteAddress  = (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_WRITE_ADDR_OFF] << 8U);
+    usRegWriteAddress |= (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_WRITE_ADDR_OFF + 1]);
+    usRegWriteAddress++;
 
-        ucRegWriteByteCount = pucFrame[MB_PDU_FUNC_READWRITE_BYTECNT_OFF];
+    usRegWriteCount  = (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_WRITE_REGCNT_OFF] << 8U);
+    usRegWriteCount |= (uint16_t)(pucFrame[MB_PDU_FUNC_READWRITE_WRITE_REGCNT_OFF + 1]);
 
-        if ((usRegReadCount  >= 1) && (usRegReadCount  <= 0x7D) &&
-            (usRegWriteCount >= 1) && (usRegWriteCount <= 0x79) &&
-            ((2 * usRegWriteCount) == ucRegWriteByteCount)) {
-            /* Make callback to update the register values. */
-            eRegStatus =
-                eMBRegHoldingCB(&pucFrame[MB_PDU_FUNC_READWRITE_WRITE_VALUES_OFF],
-                                usRegWriteAddress, usRegWriteCount, MB_REG_WRITE);
+    ucRegWriteByteCount = pucFrame[MB_PDU_FUNC_READWRITE_BYTECNT_OFF];
 
-            if (eRegStatus == MB_ENOERR) {
-                /* Set the current PDU data pointer to the beginning. */
-                pucFrameCur = &pucFrame[MB_PDU_FUNC_OFF];
-                *usLen = MB_PDU_FUNC_OFF;
+    if ((usRegReadCount  < 1) || (usRegReadCount  > 0x7D) ||
+        (usRegWriteCount < 1) || (usRegWriteCount > 0x79) ||
+        ((2 * usRegWriteCount) != ucRegWriteByteCount))
+        return MB_EX_ILLEGAL_DATA_VALUE;
 
-                /* First byte contains the function code. */
-                *pucFrameCur++ = MB_FUNC_READWRITE_MULTIPLE_REGISTERS;
-                *usLen += 1;
+    /* Make callback to update the register values. */
+    eRegStatus =
+        eMBRegHoldingCB(&pucFrame[MB_PDU_FUNC_READWRITE_WRITE_VALUES_OFF],
+                        usRegWriteAddress, usRegWriteCount, MB_REG_WRITE);
 
-                /* Second byte in the response contain the number of bytes. */
-                *pucFrameCur++ = (uint8_t)(usRegReadCount * 2);
-                *usLen += 1;
+    if (eRegStatus != MB_ENOERR)
+        return prveMBError2Exception(eRegStatus);
 
-                /* Make the read callback. */
-                eRegStatus =
-                    eMBRegHoldingCB(pucFrameCur, usRegReadAddress, usRegReadCount, MB_REG_READ);
-                if (eRegStatus == MB_ENOERR) {
-                    *usLen += 2 * usRegReadCount;
-                }
-            }
-            if (eRegStatus != MB_ENOERR) {
-                eStatus = prveMBError2Exception(eRegStatus);
-            }
-        } else {
-            eStatus = MB_EX_ILLEGAL_DATA_VALUE;
-        }
-    }
-    return eStatus;
+    /* Set the current PDU data pointer to the beginning. */
+    pucFrameCur = &pucFrame[MB_PDU_FUNC_OFF];
+    *usLen = MB_PDU_FUNC_OFF;
+
+    /* First byte contains the function code. */
+    *pucFrameCur++ = MB_FUNC_READWRITE_MULTIPLE_REGISTERS;
+    *usLen += 1;
+
+    /* Second byte in the response contain the number of bytes. */
+    *pucFrameCur++ = (uint8_t)(usRegReadCount * 2);
+    *usLen += 1;
+
+    /* Make the read callback. */
+    eRegStatus =
+        eMBRegHoldingCB(pucFrameCur, usRegReadAddress, usRegReadCount, MB_REG_READ);
+
+    if (eRegStatus != MB_ENOERR)
+        return prveMBError2Exception(eRegStatus);
+
+    *usLen += 2 * usRegReadCount;
+    return MB_EX_NONE;
 }
 
 #endif

@@ -116,25 +116,17 @@ xMBUtilGetBits(uint8_t *ucByteBuf, uint16_t usBitOffset, uint8_t ucNBits)
 eMBException
 prveMBError2Exception(eMBErrorCode eErrorCode)
 {
-    eMBException    eStatus;
-
     switch (eErrorCode) {
-        case MB_ENOERR:
-            eStatus = MB_EX_NONE;
-            break;
+    case MB_ENOERR:
+        return MB_EX_NONE;
 
-        case MB_ENOREG:
-            eStatus = MB_EX_ILLEGAL_DATA_ADDRESS;
-            break;
+    case MB_ENOREG:
+        return MB_EX_ILLEGAL_DATA_ADDRESS;
 
-        case MB_ETIMEDOUT:
-            eStatus = MB_EX_SLAVE_BUSY;
-            break;
+    case MB_ETIMEDOUT:
+        return MB_EX_SLAVE_BUSY;
 
-        default:
-            eStatus = MB_EX_SLAVE_DEVICE_FAILURE;
-            break;
+    default:
+        return MB_EX_SLAVE_DEVICE_FAILURE;
     }
-
-    return eStatus;
 }
