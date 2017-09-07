@@ -123,6 +123,7 @@ eMBFuncReadCoils(uint8_t *pucFrame, uint16_t *usLen)
     return MB_EX_NONE;
 }
 
+#endif
 
 #if MB_FUNC_WRITE_COIL_ENABLED > 0
 
@@ -210,7 +211,5 @@ eMBFuncWriteMultipleCoils(uint8_t *pucFrame, uint16_t *usLen)
     *usLen = MB_PDU_FUNC_WRITE_MUL_BYTECNT_OFF;
     return MB_EX_NONE;
 }
-
-#endif
 
 #endif
