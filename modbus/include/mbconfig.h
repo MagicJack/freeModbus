@@ -42,18 +42,28 @@ PR_BEGIN_EXTERN_C
  * and program memory space should be saved.<br>
  *
  * All of these settings are available in the file <code>mbconfig.h</code>
+ *
+ * Set XXX_ENABLED to value 1 will enable compilation of the related
+ * part of codes.
+ * And vice versa, to disable it set its value to 0.
  */
 /*! \addtogroup modbus_cfg
  *  @{
  */
 /*! \brief If Modbus ASCII support is enabled. */
+#ifndef MB_ASCII_ENABLED
 #define MB_ASCII_ENABLED                        (  1 )
+#endif
 
 /*! \brief If Modbus RTU support is enabled. */
+#ifndef MB_RTU_ENABLED
 #define MB_RTU_ENABLED                          (  1 )
+#endif
 
 /*! \brief If Modbus TCP support is enabled. */
+#ifndef MB_TCP_ENABLED
 #define MB_TCP_ENABLED                          (  0 )
+#endif
 
 /*! \brief The character timeout value for Modbus ASCII.
  *
@@ -61,7 +71,9 @@ PR_BEGIN_EXTERN_C
  * a configuration option. It should be set to the maximum expected delay
  * time of the network.
  */
+#ifndef MB_ASCII_TIMEOUT_SEC
 #define MB_ASCII_TIMEOUT_SEC                    (  1 )
+#endif
 
 /*! \brief Timeout to wait in ASCII prior to enabling transmitter.
  *
@@ -83,7 +95,9 @@ PR_BEGIN_EXTERN_C
  * the sum of all enabled functions in this file and custom function
  * handlers. If set to small adding more functions will fail.
  */
+#ifndef MB_FUNC_HANDLERS_MAX
 #define MB_FUNC_HANDLERS_MAX                    ( 16 )
+#endif
 
 /*! \brief Number of bytes which should be allocated for the <em>Report Slave ID
  *    </em>command.
@@ -93,37 +107,59 @@ PR_BEGIN_EXTERN_C
  * how to set this value. It is only used if MB_FUNC_OTHER_REP_SLAVEID_ENABLED
  * is set to <code>1</code>.
  */
+#ifndef MB_FUNC_OTHER_REP_SLAVEID_BUF
 #define MB_FUNC_OTHER_REP_SLAVEID_BUF           ( 32 )
+#endif
 
 /*! \brief If the <em>Report Slave ID</em> function should be enabled. */
+#ifndef MB_FUNC_OTHER_REP_SLAVEID_ENABLED
 #define MB_FUNC_OTHER_REP_SLAVEID_ENABLED       (  1 )
+#endif
 
 /*! \brief If the <em>Read Input Registers</em> function should be enabled. */
+#ifndef MB_FUNC_READ_INPUT_ENABLED
 #define MB_FUNC_READ_INPUT_ENABLED              (  1 )
+#endif
 
 /*! \brief If the <em>Read Holding Registers</em> function should be enabled. */
+#ifndef MB_FUNC_READ_HOLDING_ENABLED
 #define MB_FUNC_READ_HOLDING_ENABLED            (  1 )
+#endif
 
 /*! \brief If the <em>Write Single Register</em> function should be enabled. */
+#ifndef MB_FUNC_WRITE_HOLDING_ENABLED
 #define MB_FUNC_WRITE_HOLDING_ENABLED           (  1 )
+#endif
 
 /*! \brief If the <em>Write Multiple registers</em> function should be enabled. */
+#ifndef MB_FUNC_WRITE_MULTIPLE_HOLDING_ENABLED
 #define MB_FUNC_WRITE_MULTIPLE_HOLDING_ENABLED  (  1 )
+#endif
 
 /*! \brief If the <em>Read Coils</em> function should be enabled. */
+#ifndef MB_FUNC_READ_COILS_ENABLED
 #define MB_FUNC_READ_COILS_ENABLED              (  1 )
+#endif
 
 /*! \brief If the <em>Write Coils</em> function should be enabled. */
+#ifndef MB_FUNC_WRITE_COIL_ENABLED
 #define MB_FUNC_WRITE_COIL_ENABLED              (  1 )
+#endif
 
 /*! \brief If the <em>Write Multiple Coils</em> function should be enabled. */
+#ifndef MB_FUNC_WRITE_MULTIPLE_COILS_ENABLED
 #define MB_FUNC_WRITE_MULTIPLE_COILS_ENABLED    (  1 )
+#endif
 
 /*! \brief If the <em>Read Discrete Inputs</em> function should be enabled. */
+#ifndef MB_FUNC_READ_DISCRETE_INPUTS_ENABLED
 #define MB_FUNC_READ_DISCRETE_INPUTS_ENABLED    (  1 )
+#endif
 
 /*! \brief If the <em>Read/Write Multiple Registers</em> function should be enabled. */
+#ifndef MB_FUNC_READWRITE_HOLDING_ENABLED
 #define MB_FUNC_READWRITE_HOLDING_ENABLED       (  1 )
+#endif
 
 /*! @} */
 #ifdef __cplusplus
