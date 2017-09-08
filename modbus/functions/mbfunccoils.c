@@ -143,6 +143,8 @@ eMBFuncReadCoils( UCHAR * pucFrame, USHORT * usLen )
     return eStatus;
 }
 
+#endif
+
 #if MB_FUNC_WRITE_COIL_ENABLED > 0
 eMBException
 eMBFuncWriteCoil( UCHAR * pucFrame, USHORT * usLen )
@@ -264,7 +266,5 @@ eMBFuncWriteMultipleCoils( UCHAR * pucFrame, USHORT * usLen )
     }
     return eStatus;
 }
-
-#endif
 
 #endif
