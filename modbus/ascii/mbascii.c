@@ -251,6 +251,13 @@ xMBASCIIReceiveFSM( void )
         else
         {
             ucResult = prvucMBCHAR2BIN( ucByte );
+            // Prevent form processing illeagle characters.
+            if (ucResult == 0xFF)
+            {
+                eRcvState = STATE_RX_IDLE;
+                vMBPortTimersDisable();
+                break;      // break STATE_RX_RCV case
+            }
             switch ( eBytePos )
             {
                 /* High nibble of the byte comes first. We check for
