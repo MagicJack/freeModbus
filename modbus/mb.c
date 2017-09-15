@@ -86,9 +86,6 @@ BOOL    (*pxMBFrameCBByteReceived)(void);
 BOOL    (*pxMBFrameCBTransmitterEmpty)(void);
 BOOL    (*pxMBPortCBTimerExpired)(void);
 
-BOOL    (*pxMBFrameCBReceiveFSMCur)(void);
-BOOL    (*pxMBFrameCBTransmitFSMCur)(void);
-
 /* An array of Modbus functions handlers which associates Modbus function
  * codes with implementing functions.
  */
