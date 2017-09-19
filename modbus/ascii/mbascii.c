@@ -180,7 +180,7 @@ eMBASCIISend(uint8_t ucSlaveAddress, const uint8_t *pucFrame, uint16_t usLength)
     uint8_t         usLRC;
 
     ENTER_CRITICAL_SECTION();
-    /* Check if the receiver is still in idle state. If not we where too
+    /* Check if the receiver is still in idle state. If not, we were too
      * slow with processing the received frame and the master sent another
      * frame on the network. We have to abort sending the frame.
      */
@@ -216,7 +216,9 @@ xMBASCIIReceiveFSM(void)
 
     assert(eSndState == STATE_TX_IDLE);
 
+    /* Always read the character. */
     (void)xMBPortSerialGetByte((int8_t *) &ucByte);
+
     switch (eRcvState) {
         /* A new character is received. If the character is a ':' the input
          * buffer is cleared. A CR-character signals the end of the data
@@ -310,15 +312,15 @@ BOOL
 xMBASCIITransmitFSM(void)
 {
     BOOL            xNeedPoll = FALSE;
-    uint8_t         ucByte;
 
+    // this function runs only when receiver is idle.
     assert(eRcvState == STATE_RX_IDLE);
+
     switch (eSndState) {
         /* Start of transmission. The start of a frame is defined by sending
          * the character ':'. */
     case STATE_TX_START:
-        ucByte = ':';
-        xMBPortSerialPutByte((int8_t)ucByte);
+        xMBPortSerialPutByte((int8_t)':');
         eSndState = STATE_TX_DATA;
         eBytePos = BYTE_HIGH_NIBBLE;
         break;
@@ -331,14 +333,12 @@ xMBASCIITransmitFSM(void)
         if (usSndBufferCount > 0) {
             switch (eBytePos) {
             case BYTE_HIGH_NIBBLE:
-                ucByte = prvucMBBIN2CHAR((uint8_t)(*pucSndBufferCur >> 4));
-                xMBPortSerialPutByte((int8_t) ucByte);
+                xMBPortSerialPutByte((int8_t)prvucMBBIN2CHAR((uint8_t)*pucSndBufferCur >> 4));
                 eBytePos = BYTE_LOW_NIBBLE;
                 break;
 
             case BYTE_LOW_NIBBLE:
-                ucByte = prvucMBBIN2CHAR((uint8_t)*pucSndBufferCur);
-                xMBPortSerialPutByte((int8_t)ucByte);
+                xMBPortSerialPutByte((int8_t)prvucMBBIN2CHAR((uint8_t)*pucSndBufferCur));
                 pucSndBufferCur++;
                 eBytePos = BYTE_HIGH_NIBBLE;
                 usSndBufferCount--;
