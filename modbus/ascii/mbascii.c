@@ -337,7 +337,7 @@ xMBASCIITransmitFSM(void)
                 break;
 
             case BYTE_LOW_NIBBLE:
-                ucByte = prvucMBBIN2CHAR((uint8_t)(*pucSndBufferCur & 0x0F));
+                ucByte = prvucMBBIN2CHAR((uint8_t)*pucSndBufferCur);
                 xMBPortSerialPutByte((int8_t)ucByte);
                 pucSndBufferCur++;
                 eBytePos = BYTE_HIGH_NIBBLE;
@@ -419,15 +419,11 @@ prvucMBCHAR2BIN(uint8_t ucCharacter)
 static uint8_t
 prvucMBBIN2CHAR(uint8_t ucByte)
 {
+    ucByte &= 0x0F;
     if (ucByte <= 0x09) {
         return (uint8_t)('0' + ucByte);
-    } else if ((ucByte >= 0x0A) && (ucByte <= 0x0F)) {
-        return (uint8_t)(ucByte - 0x0A + 'A');
-    } else {
-        /* Programming error. */
-        assert(0);
     }
-    return '0';
+    return (uint8_t)(ucByte - 0x0A + 'A');
 }
 
 
