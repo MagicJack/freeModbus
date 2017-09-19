@@ -131,52 +131,51 @@ eMBInit(eMBMode eMode, uint8_t ucSlaveAddress, uint8_t ucPort, uint32_t ulBaudRa
     /* check preconditions */
     if ((ucSlaveAddress == MB_ADDRESS_BROADCAST) ||
         (ucSlaveAddress < MB_ADDRESS_MIN) ||
-        (ucSlaveAddress > MB_ADDRESS_MAX)) {
-        eStatus = MB_EINVAL;
-    } else {
-        ucMBAddress = ucSlaveAddress;
+        (ucSlaveAddress > MB_ADDRESS_MAX))
+        return MB_EINVAL;
 
-        switch (eMode) {
+    ucMBAddress = ucSlaveAddress;
+
+    switch (eMode) {
 #if MB_RTU_ENABLED > 0
-        case MB_RTU:
-            pvMBFrameStartCur           = eMBRTUStart;
-            pvMBFrameStopCur            = eMBRTUStop;
-            peMBFrameSendCur            = eMBRTUSend;
-            peMBFrameReceiveCur         = eMBRTUReceive;
-            pvMBFrameCloseCur           = MB_PORT_HAS_CLOSE ? vMBPortClose : NULL;
-            pxMBFrameCBByteReceived     = xMBRTUReceiveFSM;
-            pxMBFrameCBTransmitterEmpty = xMBRTUTransmitFSM;
-            pxMBPortCBTimerExpired      = xMBRTUTimerT35Expired;
+    case MB_RTU:
+        pvMBFrameStartCur           = eMBRTUStart;
+        pvMBFrameStopCur            = eMBRTUStop;
+        peMBFrameSendCur            = eMBRTUSend;
+        peMBFrameReceiveCur         = eMBRTUReceive;
+        pvMBFrameCloseCur           = MB_PORT_HAS_CLOSE ? vMBPortClose : NULL;
+        pxMBFrameCBByteReceived     = xMBRTUReceiveFSM;
+        pxMBFrameCBTransmitterEmpty = xMBRTUTransmitFSM;
+        pxMBPortCBTimerExpired      = xMBRTUTimerT35Expired;
 
-            eStatus = eMBRTUInit(ucMBAddress, ucPort, ulBaudRate, eParity);
-            break;
+        eStatus = eMBRTUInit(ucMBAddress, ucPort, ulBaudRate, eParity);
+        break;
 #endif
 #if MB_ASCII_ENABLED > 0
-        case MB_ASCII:
-            pvMBFrameStartCur           = eMBASCIIStart;
-            pvMBFrameStopCur            = eMBASCIIStop;
-            peMBFrameSendCur            = eMBASCIISend;
-            peMBFrameReceiveCur         = eMBASCIIReceive;
-            pvMBFrameCloseCur           = MB_PORT_HAS_CLOSE ? vMBPortClose : NULL;
-            pxMBFrameCBByteReceived     = xMBASCIIReceiveFSM;
-            pxMBFrameCBTransmitterEmpty = xMBASCIITransmitFSM;
-            pxMBPortCBTimerExpired      = xMBASCIITimerT1SExpired;
+    case MB_ASCII:
+        pvMBFrameStartCur           = eMBASCIIStart;
+        pvMBFrameStopCur            = eMBASCIIStop;
+        peMBFrameSendCur            = eMBASCIISend;
+        peMBFrameReceiveCur         = eMBASCIIReceive;
+        pvMBFrameCloseCur           = MB_PORT_HAS_CLOSE ? vMBPortClose : NULL;
+        pxMBFrameCBByteReceived     = xMBASCIIReceiveFSM;
+        pxMBFrameCBTransmitterEmpty = xMBASCIITransmitFSM;
+        pxMBPortCBTimerExpired      = xMBASCIITimerT1SExpired;
 
-            eStatus = eMBASCIIInit(ucMBAddress, ucPort, ulBaudRate, eParity);
-            break;
+        eStatus = eMBASCIIInit(ucMBAddress, ucPort, ulBaudRate, eParity);
+        break;
 #endif
-        default:
-            eStatus = MB_EINVAL;
-        }
+    default:
+        eStatus = MB_EINVAL;
+    }
 
-        if (eStatus == MB_ENOERR) {
-            if (!xMBPortEventInit()) {
-                /* port dependent event module initalization failed. */
-                eStatus = MB_EPORTERR;
-            } else {
-                eMBCurrentMode = eMode;
-                eMBState = STATE_DISABLED;
-            }
+    if (eStatus == MB_ENOERR) {
+        if (!xMBPortEventInit()) {
+            /* port dependent event module initalization failed. */
+            eStatus = MB_EPORTERR;
+        } else {
+            eMBCurrentMode = eMode;
+            eMBState = STATE_DISABLED;
         }
     }
     return eStatus;
@@ -186,24 +185,25 @@ eMBInit(eMBMode eMode, uint8_t ucSlaveAddress, uint8_t ucPort, uint32_t ulBaudRa
 eMBErrorCode
 eMBTCPInit(uint16_t ucTCPPort)
 {
-    eMBErrorCode    eStatus = MB_ENOERR;
-
-    if ((eStatus = eMBTCPDoInit(ucTCPPort)) != MB_ENOERR) {
+    if (eMBTCPDoInit(ucTCPPort) != MB_ENOERR) {
         eMBState = STATE_DISABLED;
-    } else if (!xMBPortEventInit()) {
-        /* Port dependent event module initalization failed. */
-        eStatus = MB_EPORTERR;
-    } else {
-        pvMBFrameStartCur   = eMBTCPStart;
-        pvMBFrameStopCur    = eMBTCPStop;
-        peMBFrameReceiveCur = eMBTCPReceive;
-        peMBFrameSendCur    = eMBTCPSend;
-        pvMBFrameCloseCur   = MB_PORT_HAS_CLOSE ? vMBTCPPortClose : NULL;
-        ucMBAddress         = MB_TCP_PSEUDO_ADDRESS;
-        eMBCurrentMode      = MB_TCP;
-        eMBState = STATE_DISABLED;
+        return MB_ENOERR;
     }
-    return eStatus;
+
+    /* Port dependent event module initalization failed. */
+    if (!xMBPortEventInit())
+        return MB_EPORTERR;
+
+    pvMBFrameStartCur   = eMBTCPStart;
+    pvMBFrameStopCur    = eMBTCPStop;
+    peMBFrameReceiveCur = eMBTCPReceive;
+    peMBFrameSendCur    = eMBTCPSend;
+    pvMBFrameCloseCur   = MB_PORT_HAS_CLOSE ? vMBTCPPortClose : NULL;
+    ucMBAddress         = MB_TCP_PSEUDO_ADDRESS;
+    eMBCurrentMode      = MB_TCP;
+
+    eMBState = STATE_DISABLED;
+    return MB_ENOERR;
 }
 #endif
 
@@ -211,84 +211,77 @@ eMBErrorCode
 eMBRegisterCB(uint8_t ucFunctionCode, pxMBFunctionHandler pxHandler)
 {
     int             i;
-    eMBErrorCode    eStatus;
 
-    if ((0 < ucFunctionCode) && (ucFunctionCode <= 127)) {
-        ENTER_CRITICAL_SECTION();
-        if (pxHandler != NULL) {
-            for (i = 0; i < MB_FUNC_HANDLERS_MAX; i++) {
-                if ((xFuncHandlers[i].pxHandler == NULL) ||
-                    (xFuncHandlers[i].pxHandler == pxHandler)) {
-                    xFuncHandlers[i].ucFunctionCode = ucFunctionCode;
-                    xFuncHandlers[i].pxHandler = pxHandler;
-                    break;
-                }
+    if ((ucFunctionCode > 127))
+        return MB_EINVAL;
+
+    if (pxHandler != NULL) {
+        for (i = 0; i < MB_FUNC_HANDLERS_MAX; i++) {
+            if ((xFuncHandlers[i].pxHandler == NULL) ||
+                (xFuncHandlers[i].pxHandler == pxHandler)) {
+                ENTER_CRITICAL_SECTION();
+                xFuncHandlers[i].ucFunctionCode = ucFunctionCode;
+                xFuncHandlers[i].pxHandler = pxHandler;
+                EXIT_CRITICAL_SECTION();
+                return MB_ENOERR;
             }
-            eStatus = (i != MB_FUNC_HANDLERS_MAX) ? MB_ENOERR : MB_ENORES;
-        } else {
-            for (i = 0; i < MB_FUNC_HANDLERS_MAX; i++) {
-                if (xFuncHandlers[i].ucFunctionCode == ucFunctionCode) {
-                    xFuncHandlers[i].ucFunctionCode = 0;
-                    xFuncHandlers[i].pxHandler = NULL;
-                    break;
-                }
-            }
-            /* Remove can't fail. */
-            eStatus = MB_ENOERR;
         }
-        EXIT_CRITICAL_SECTION();
+        return MB_ENORES;
     } else {
-        eStatus = MB_EINVAL;
+        for (i = 0; i < MB_FUNC_HANDLERS_MAX; i++) {
+            if (xFuncHandlers[i].ucFunctionCode == ucFunctionCode) {
+                ENTER_CRITICAL_SECTION();
+                xFuncHandlers[i].ucFunctionCode = 0;
+                xFuncHandlers[i].pxHandler = NULL;
+                EXIT_CRITICAL_SECTION();
+                break;
+            }
+        }
+        /* Remove can't fail. */
+        return MB_ENOERR;
     }
-    return eStatus;
 }
 
 
 eMBErrorCode
 eMBClose(void)
 {
-    eMBErrorCode    eStatus = MB_ENOERR;
+    if (eMBState != STATE_DISABLED)
+        return MB_EILLSTATE;
 
-    if (eMBState == STATE_DISABLED) {
-        if (pvMBFrameCloseCur != NULL) {
-            pvMBFrameCloseCur();
-        }
-    } else {
-        eStatus = MB_EILLSTATE;
-    }
-    return eStatus;
+    if (pvMBFrameCloseCur != NULL)
+        pvMBFrameCloseCur();
+
+    return MB_ENOERR;
 }
 
 eMBErrorCode
 eMBEnable(void)
 {
-    eMBErrorCode    eStatus = MB_ENOERR;
+    if (eMBState != STATE_DISABLED)
+        return MB_EILLSTATE;
 
-    if (eMBState == STATE_DISABLED) {
-        /* Activate the protocol stack. */
-        pvMBFrameStartCur();
-        eMBState = STATE_ENABLED;
-    } else {
-        eStatus = MB_EILLSTATE;
-    }
-    return eStatus;
+    /* Activate the protocol stack. */
+    pvMBFrameStartCur();
+    eMBState = STATE_ENABLED;
+
+    return MB_ENOERR;
 }
 
 eMBErrorCode
 eMBDisable(void)
 {
-    eMBErrorCode    eStatus;
-
-    if (eMBState == STATE_ENABLED) {
-        pvMBFrameStopCur();
-        eMBState = STATE_DISABLED;
-        eStatus = MB_ENOERR;
-    } else if (eMBState == STATE_DISABLED) {
-        eStatus = MB_ENOERR;
-    } else {
-        eStatus = MB_EILLSTATE;
+    if (eMBState != STATE_ENABLED) {
+        if (eMBState == STATE_DISABLED)
+            return MB_ENOERR;
+        else
+            return MB_EILLSTATE;
     }
-    return eStatus;
+
+    pvMBFrameStopCur();
+    eMBState = STATE_DISABLED;
+
+    return MB_ENOERR;
 }
 
 eMBErrorCode
@@ -305,59 +298,59 @@ eMBPoll(void)
     eMBEventType    eEvent;
 
     /* Check if the protocol stack is ready. */
-    if (eMBState != STATE_ENABLED) {
+    if (eMBState != STATE_ENABLED)
         return MB_EILLSTATE;
-    }
 
     /* Check if there is a event available. If not return control to caller.
      * Otherwise we will handle the event. */
-    if (xMBPortEventGet(&eEvent) == TRUE) {
-        switch (eEvent) {
-        case EV_READY:
-            break;
+    if (!xMBPortEventGet(&eEvent))
+        return MB_ENOERR;
 
-        case EV_FRAME_RECEIVED:
-            eStatus = peMBFrameReceiveCur(&ucRcvAddress, &ucMBFrame, &usLength);
-            if (eStatus == MB_ENOERR) {
-                /* Check if the frame is for us. If not ignore the frame. */
-                if ((ucRcvAddress == ucMBAddress) || (ucRcvAddress == MB_ADDRESS_BROADCAST)) {
-                    (void)xMBPortEventPost(EV_EXECUTE);
-                }
+    switch (eEvent) {
+    case EV_READY:
+        break;
+
+    case EV_FRAME_RECEIVED:
+        eStatus = peMBFrameReceiveCur(&ucRcvAddress, &ucMBFrame, &usLength);
+        if (eStatus == MB_ENOERR) {
+            /* Check if the frame is for us. If not ignore the frame. */
+            if ((ucRcvAddress == ucMBAddress) || (ucRcvAddress == MB_ADDRESS_BROADCAST)) {
+                (void)xMBPortEventPost(EV_EXECUTE);
             }
-            break;
-
-        case EV_EXECUTE:
-            ucFunctionCode = ucMBFrame[MB_PDU_FUNC_OFF];
-            eException = MB_EX_ILLEGAL_FUNCTION;
-            for (i = 0; i < MB_FUNC_HANDLERS_MAX; i++) {
-                /* No more function handlers registered. Abort. */
-                if (xFuncHandlers[i].ucFunctionCode == 0) {
-                    break;
-                } else if (xFuncHandlers[i].ucFunctionCode == ucFunctionCode) {
-                    eException = xFuncHandlers[i].pxHandler(ucMBFrame, &usLength);
-                    break;
-                }
-            }
-
-            /* If the request was not sent to the broadcast address we
-             * return a reply. */
-            if (ucRcvAddress != MB_ADDRESS_BROADCAST) {
-                if (eException != MB_EX_NONE) {
-                    /* An exception occured. Build an error frame. */
-                    usLength = 0;
-                    ucMBFrame[usLength++] = (uint8_t)(ucFunctionCode | MB_FUNC_ERROR);
-                    ucMBFrame[usLength++] = eException;
-                }
-                if ((eMBCurrentMode == MB_ASCII) && MB_ASCII_TIMEOUT_WAIT_BEFORE_SEND_MS) {
-                    vMBPortTimersDelay(MB_ASCII_TIMEOUT_WAIT_BEFORE_SEND_MS);
-                }
-                eStatus = peMBFrameSendCur(ucMBAddress, ucMBFrame, usLength);
-            }
-            break;
-
-        case EV_FRAME_SENT:
-            break;
         }
+        break;
+
+    case EV_EXECUTE:
+        ucFunctionCode = ucMBFrame[MB_PDU_FUNC_OFF];
+        eException = MB_EX_ILLEGAL_FUNCTION;
+        for (i = 0; i < MB_FUNC_HANDLERS_MAX; i++) {
+            /* No more function handlers registered. Abort. */
+            if (xFuncHandlers[i].ucFunctionCode == 0) {
+                break;
+            } else if (xFuncHandlers[i].ucFunctionCode == ucFunctionCode) {
+                eException = xFuncHandlers[i].pxHandler(ucMBFrame, &usLength);
+                break;
+            }
+        }
+
+        /* If the request was not sent to the broadcast address we
+         * return a reply. */
+        if (ucRcvAddress != MB_ADDRESS_BROADCAST) {
+            if (eException != MB_EX_NONE) {
+                /* An exception occured. Build an error frame. */
+                usLength = 0;
+                ucMBFrame[usLength++] = (uint8_t)(ucFunctionCode | MB_FUNC_ERROR);
+                ucMBFrame[usLength++] = eException;
+            }
+            if ((eMBCurrentMode == MB_ASCII) && MB_ASCII_TIMEOUT_WAIT_BEFORE_SEND_MS) {
+                vMBPortTimersDelay(MB_ASCII_TIMEOUT_WAIT_BEFORE_SEND_MS);
+            }
+            eStatus = peMBFrameSendCur(ucMBAddress, ucMBFrame, usLength);
+        }
+        break;
+
+    case EV_FRAME_SENT:
+        break;
     }
     return MB_ENOERR;
 }
