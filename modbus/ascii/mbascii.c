@@ -291,14 +291,14 @@ xMBASCIIReceiveFSM( void )
         break;
 
     case STATE_RX_WAIT_EOF:
+        /* Disable character timeout timer because all characters are
+         * received. */
+        vMBPortTimersDisable(  );
+        /* Receiver is again in idle state. */
+        eRcvState = STATE_RX_IDLE;
+
         if( ucByte == ucMBLFCharacter )
         {
-            /* Disable character timeout timer because all characters are
-             * received. */
-            vMBPortTimersDisable(  );
-            /* Receiver is again in idle state. */
-            eRcvState = STATE_RX_IDLE;
-
             /* Notify the caller of eMBASCIIReceive that a new frame
              * was received. */
             xNeedPoll = xMBPortEventPost( EV_FRAME_RECEIVED );
@@ -312,11 +312,6 @@ xMBASCIIReceiveFSM( void )
 
             /* Enable timer for character timeout. */
             vMBPortTimersEnable(  );
-        }
-        else
-        {
-            /* Frame is not okay. Delete entire frame. */
-            eRcvState = STATE_RX_IDLE;
         }
         break;
 
