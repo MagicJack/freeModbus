@@ -98,7 +98,7 @@ eMBRTUInit( UCHAR ucSlaveAddress, UCHAR ucPort, ULONG ulBaudRate, eMBParity ePar
          */
         if( ulBaudRate > 19200 )
         {
-            usTimerT35_50us = 35;       /* 1800us. */
+            usTimerT35_50us = 35;       /* 1750us. */
         }
         else
         {
@@ -107,7 +107,7 @@ eMBRTUInit( UCHAR ucSlaveAddress, UCHAR ucPort, ULONG ulBaudRate, eMBParity ePar
              * ChTimeValue = Ticks_per_1s / ( Baudrate / 11 )
              *             = 11 * Ticks_per_1s / Baudrate
              *             = 220000 / Baudrate
-             * The reload for t3.5 is 1.5 times this value and similary
+             * The reload for t1.5 is 1.5 times this value and similary
              * for t3.5.
              */
             usTimerT35_50us = ( 7UL * 220000UL ) / ( 2UL * ulBaudRate );
@@ -154,7 +154,7 @@ eMBRTUReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
     eMBErrorCode    eStatus = MB_ENOERR;
 
     ENTER_CRITICAL_SECTION(  );
-    assert( usRcvBufferPos < MB_SER_PDU_SIZE_MAX );
+    assert( usRcvBufferPos <= MB_SER_PDU_SIZE_MAX );
 
     /* Length and CRC check */
     if( ( usRcvBufferPos >= MB_SER_PDU_SIZE_MIN )
