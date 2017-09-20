@@ -211,7 +211,6 @@ eMBASCIISend(uint8_t ucSlaveAddress, const uint8_t *pucFrame, uint16_t usLength)
 BOOL
 xMBASCIIReceiveFSM(void)
 {
-    BOOL            xNeedPoll = FALSE;
     uint8_t         ucByte;
     uint8_t         ucResult;
 
@@ -220,6 +219,18 @@ xMBASCIIReceiveFSM(void)
 
     /* Always read the character. */
     (void)xMBPortSerialGetByte((int8_t *) &ucByte);
+
+    // Check START_DELIMITER first.
+    if (ucByte == ':') {
+        /* Enable timer for character timeout. */
+        vMBPortTimersEnable();
+        /* Reset the input buffers to store the frame. */
+        usRcvBufferPos = 0;
+        eBytePos = BYTE_HIGH_NIBBLE;
+        eRcvState = STATE_RX_RCV;
+
+        return FALSE;
+    }
 
     switch (eRcvState) {
         /* A new character is received. If the character is a ':' the input
@@ -230,43 +241,34 @@ xMBASCIIReceiveFSM(void)
     case STATE_RX_RCV:
         /* Enable timer for character timeout. */
         vMBPortTimersEnable();
-        if (ucByte == ':') {
-            /* Empty receive buffer. */
-            eBytePos = BYTE_HIGH_NIBBLE;
-            usRcvBufferPos = 0;
-        } else if (ucByte == MB_ASCII_DEFAULT_CR) {
+        if (ucByte == MB_ASCII_DEFAULT_CR) {
             eRcvState = STATE_RX_WAIT_EOF;
-        } else {
-            ucResult = prvucMBCHAR2BIN(ucByte);
-            // Prevent form processing illeagle characters.
-            if (ucResult == 0xFF) {
+            return FALSE;
+        }
+        ucResult = prvucMBCHAR2BIN(ucByte);
+        // Prevent form processing illeagle characters.
+        if (ucResult == 0xFF) {
+            eRcvState = STATE_RX_IDLE;
+            vMBPortTimersDisable();
+            return FALSE;
+        }
+        if (eBytePos == BYTE_HIGH_NIBBLE) {
+            /* High nibble of the byte comes first. We check for
+             * a buffer overflow here. */
+            if (usRcvBufferPos < MB_SER_PDU_SIZE_MAX) {
+                ucASCIIBuf[usRcvBufferPos] = (uint8_t)(ucResult << 4);
+                eBytePos = BYTE_LOW_NIBBLE;
+            } else {
+                /* not handled in Modbus specification but seems
+                 * a resonable implementation. */
                 eRcvState = STATE_RX_IDLE;
+                /* Disable previously activated timer because of error state. */
                 vMBPortTimersDisable();
-                break;      // break STATE_RX_RCV case
             }
-            switch (eBytePos) {
-                /* High nibble of the byte comes first. We check for
-                 * a buffer overflow here. */
-            case BYTE_HIGH_NIBBLE:
-                if (usRcvBufferPos < MB_SER_PDU_SIZE_MAX) {
-                    ucASCIIBuf[usRcvBufferPos] = (uint8_t)(ucResult << 4);
-                    eBytePos = BYTE_LOW_NIBBLE;
-                    break;
-                } else {
-                    /* not handled in Modbus specification but seems
-                     * a resonable implementation. */
-                    eRcvState = STATE_RX_IDLE;
-                    /* Disable previously activated timer because of error state. */
-                    vMBPortTimersDisable();
-                }
-                break;
-
-            case BYTE_LOW_NIBBLE:
-                ucASCIIBuf[usRcvBufferPos] |= ucResult;
-                usRcvBufferPos++;
-                eBytePos = BYTE_HIGH_NIBBLE;
-                break;
-            }
+        } else {
+            ucASCIIBuf[usRcvBufferPos] |= ucResult;
+            usRcvBufferPos++;
+            eBytePos = BYTE_HIGH_NIBBLE;
         }
         break;
 
@@ -280,34 +282,17 @@ xMBASCIIReceiveFSM(void)
 
             /* Notify the caller of eMBASCIIReceive that a new frame
              * was received. */
-            xNeedPoll = xMBPortEventPost(EV_FRAME_RECEIVED);
-        } else if (ucByte == ':') {
-            /* Empty receive buffer and back to receive state. */
-            eBytePos = BYTE_HIGH_NIBBLE;
-            usRcvBufferPos = 0;
-            eRcvState = STATE_RX_RCV;
-
-            /* Enable timer for character timeout. */
-            vMBPortTimersEnable();
-        } else {
-            /* Frame is not okay. Delete entire frame. */
-            eRcvState = STATE_RX_IDLE;
+            return xMBPortEventPost(EV_FRAME_RECEIVED);
         }
+        /* Frame is not okay. Delete entire frame. */
+        eRcvState = STATE_RX_IDLE;
         break;
 
     case STATE_RX_IDLE:
-        if (ucByte == ':') {
-            /* Enable timer for character timeout. */
-            vMBPortTimersEnable();
-            /* Reset the input buffers to store the frame. */
-            usRcvBufferPos = 0;;
-            eBytePos = BYTE_HIGH_NIBBLE;
-            eRcvState = STATE_RX_RCV;
-        }
         break;
     }
 
-    return xNeedPoll;
+    return FALSE;
 }
 
 BOOL
