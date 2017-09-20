@@ -299,8 +299,6 @@ xMBASCIIReceiveFSM(void)
 BOOL
 xMBASCIITransmitFSM(void)
 {
-    BOOL            xNeedPoll = FALSE;
-
     // this function runs only when receiver is idle.
     assert(eRcvState == STATE_RX_IDLE);
 
@@ -319,18 +317,14 @@ xMBASCIITransmitFSM(void)
          * to end the transmission. */
     case STATE_TX_DATA:
         if (usSndBufferCount > 0) {
-            switch (eBytePos) {
-            case BYTE_HIGH_NIBBLE:
+            if (eBytePos == BYTE_HIGH_NIBBLE) {
                 xMBPortSerialPutByte((int8_t)prvucMBBIN2CHAR((uint8_t)*pucSndBufferCur >> 4));
                 eBytePos = BYTE_LOW_NIBBLE;
-                break;
-
-            case BYTE_LOW_NIBBLE:
+            } else {
                 xMBPortSerialPutByte((int8_t)prvucMBBIN2CHAR((uint8_t)*pucSndBufferCur));
                 pucSndBufferCur++;
                 eBytePos = BYTE_HIGH_NIBBLE;
                 usSndBufferCount--;
-                break;
             }
         } else {
             xMBPortSerialPutByte(MB_ASCII_DEFAULT_CR);
@@ -349,14 +343,11 @@ xMBASCIITransmitFSM(void)
         /* Notify the task which called eMBASCIISend that the frame has
          * been sent. */
     case STATE_TX_NOTIFY:
-        eSndState = STATE_TX_IDLE;
-        xNeedPoll = xMBPortEventPost(EV_FRAME_SENT);
-
         /* Disable transmitter. This prevents another transmit buffer
          * empty interrupt. */
         vMBPortSerialEnable(TRUE, FALSE);
         eSndState = STATE_TX_IDLE;
-        break;
+        return xMBPortEventPost(EV_FRAME_SENT);
 
         /* We should not get a transmitter event if the transmitter is in
          * idle state.  */
@@ -366,7 +357,7 @@ xMBASCIITransmitFSM(void)
         break;
     }
 
-    return xNeedPoll;
+    return FALSE;
 }
 
 BOOL
