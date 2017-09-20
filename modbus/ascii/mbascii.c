@@ -90,7 +90,7 @@ static volatile eMBRcvState eRcvState;
 /* We reuse the Modbus RTU buffer because only one buffer is needed and the
  * RTU buffer is bigger. */
 extern volatile uint8_t     ucRTUBuf[];
-static volatile uint8_t    *ucASCIIBuf = ucRTUBuf;
+#define ucASCIIBuf          ucRTUBuf
 
 static volatile uint16_t    usRcvBufferPos;
 static volatile eMBBytePos  eBytePos;
@@ -106,6 +106,7 @@ eMBErrorCode
 eMBASCIIInit(uint8_t ucSlaveAddress, uint8_t ucPort, uint32_t ulBaudRate, eMBParity eParity)
 {
     eMBErrorCode    eStatus = MB_ENOERR;
+
     (void)ucSlaveAddress;
 
     ENTER_CRITICAL_SECTION();
@@ -148,8 +149,8 @@ eMBASCIIReceive(uint8_t *pucRcvAddress, uint8_t **pucFrame, uint16_t *pusLength)
 {
     eMBErrorCode    eStatus = MB_ENOERR;
 
-    ENTER_CRITICAL_SECTION();
     assert(usRcvBufferPos <= MB_SER_PDU_SIZE_MAX);
+    ENTER_CRITICAL_SECTION();
 
     /* Length and CRC check */
     if ((usRcvBufferPos >= MB_SER_PDU_SIZE_MIN) &&
@@ -214,6 +215,7 @@ xMBASCIIReceiveFSM(void)
     uint8_t         ucByte;
     uint8_t         ucResult;
 
+    // this function runs only when transmitter is idle.
     assert(eSndState == STATE_TX_IDLE);
 
     /* Always read the character. */
