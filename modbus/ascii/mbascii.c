@@ -92,7 +92,7 @@ static volatile eMBRcvState eRcvState;
 /* We reuse the Modbus RTU buffer because only one buffer is needed and the
  * RTU buffer is bigger. */
 extern volatile UCHAR ucRTUBuf[];
-static volatile UCHAR *ucASCIIBuf = ucRTUBuf;
+#define ucASCIIBuf    ucRTUBuf
 
 static volatile USHORT usRcvBufferPos;
 static volatile eMBBytePos eBytePos;
@@ -153,8 +153,8 @@ eMBASCIIReceive( UCHAR * pucRcvAddress, UCHAR ** pucFrame, USHORT * pusLength )
 {
     eMBErrorCode    eStatus = MB_ENOERR;
 
-    ENTER_CRITICAL_SECTION(  );
     assert( usRcvBufferPos <= MB_SER_PDU_SIZE_MAX );
+    ENTER_CRITICAL_SECTION(  );
 
     /* Length and CRC check */
     if( ( usRcvBufferPos >= MB_SER_PDU_SIZE_MIN )
@@ -225,8 +225,10 @@ xMBASCIIReceiveFSM( void )
     UCHAR           ucByte;
     UCHAR           ucResult;
 
+    // this function runs only when transmitter is idle.
     assert( eSndState == STATE_TX_IDLE );
 
+    /* Always read the character. */
     ( void )xMBPortSerialGetByte( ( CHAR * ) & ucByte );
     switch ( eRcvState )
     {
@@ -340,7 +342,9 @@ xMBASCIITransmitFSM( void )
     BOOL            xNeedPoll = FALSE;
     UCHAR           ucByte;
 
+    // this function runs only when receiver is idle.
     assert( eRcvState == STATE_RX_IDLE );
+
     switch ( eSndState )
     {
         /* Start of transmission. The start of a frame is defined by sending
