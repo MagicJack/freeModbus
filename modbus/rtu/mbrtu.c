@@ -94,14 +94,14 @@ eMBRTUInit(uint8_t ucSlaveAddress, uint8_t ucPort, uint32_t ulBaudRate, eMBParit
          * t35 = 1750us. Otherwise t35 must be 3.5 times the character time.
          */
         if (ulBaudRate > 19200) {
-            usTimerT35_50us = 35;       /* 1800us. */
+            usTimerT35_50us = 35;       /* 1750us. */
         } else {
             /* The timer reload value for a character is given by:
              *
              * ChTimeValue = Ticks_per_1s / (Baudrate / 11)
              *             = 11 * Ticks_per_1s / Baudrate
              *             = 220000 / Baudrate
-             * The reload for t3.5 is 1.5 times this value and similary
+             * The reload for t1.5 is 1.5 times this value and similary
              * for t3.5.
              */
             usTimerT35_50us = (7UL * 220000UL) / (2UL * ulBaudRate);
@@ -147,7 +147,7 @@ eMBRTUReceive(uint8_t *pucRcvAddress, uint8_t **pucFrame, uint16_t *pusLength)
     eMBErrorCode    eStatus = MB_ENOERR;
 
     ENTER_CRITICAL_SECTION();
-    assert(usRcvBufferPos < MB_SER_PDU_SIZE_MAX);
+    assert(usRcvBufferPos <= MB_SER_PDU_SIZE_MAX);
 
     /* Length and CRC check */
     if ((usRcvBufferPos >= MB_SER_PDU_SIZE_MIN) &&
