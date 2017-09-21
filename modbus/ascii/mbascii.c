@@ -243,28 +243,23 @@ xMBASCIIReceiveFSM(void)
         vMBPortTimersEnable();
         if (ucByte == MB_ASCII_DEFAULT_CR) {
             eRcvState = STATE_RX_WAIT_EOF;
-            return FALSE;
+            break;
         }
         ucResult = prvucMBCHAR2BIN(ucByte);
-        // Prevent form processing illeagle characters.
-        if (ucResult == 0xFF) {
+        /* Prevent form processing illeagle characters.
+         * and a overflow-size-frame. */
+        if (ucResult == 0xFF ||
+            usRcvBufferPos >= MB_SER_PDU_SIZE_MAX ) {
             eRcvState = STATE_RX_IDLE;
+            /* Disable previously activated timer because of error state. */
             vMBPortTimersDisable();
-            return FALSE;
+            break;
         }
         if (eBytePos == BYTE_HIGH_NIBBLE) {
             /* High nibble of the byte comes first. We check for
              * a buffer overflow here. */
-            if (usRcvBufferPos < MB_SER_PDU_SIZE_MAX) {
-                ucASCIIBuf[usRcvBufferPos] = (uint8_t)(ucResult << 4);
-                eBytePos = BYTE_LOW_NIBBLE;
-            } else {
-                /* not handled in Modbus specification but seems
-                 * a resonable implementation. */
-                eRcvState = STATE_RX_IDLE;
-                /* Disable previously activated timer because of error state. */
-                vMBPortTimersDisable();
-            }
+            ucASCIIBuf[usRcvBufferPos] = (uint8_t)(ucResult << 4);
+            eBytePos = BYTE_LOW_NIBBLE;
         } else {
             ucASCIIBuf[usRcvBufferPos] |= ucResult;
             usRcvBufferPos++;
