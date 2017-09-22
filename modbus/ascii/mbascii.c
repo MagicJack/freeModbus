@@ -81,7 +81,7 @@ typedef enum
 /* ----------------------- Static functions ---------------------------------*/
 static uint8_t      prvucMBCHAR2BIN(uint8_t ucCharacter);
 static uint8_t      prvucMBBIN2CHAR(uint8_t ucByte);
-static uint8_t      prvucMBLRC(uint8_t *pucFrame, uint16_t usLen);
+static uint8_t      prvucMBLRC(uint8_t *pucFrame, uint8_t usLen);
 
 /* ----------------------- Static variables ---------------------------------*/
 static volatile eMBSndState eSndState;
@@ -92,7 +92,7 @@ static volatile eMBRcvState eRcvState;
 extern volatile uint8_t     ucRTUBuf[];
 #define ucASCIIBuf          ucRTUBuf
 
-static volatile uint16_t    usRcvBufferPos;
+static volatile uint8_t     usRcvBufferPos;
 static volatile eMBBytePos  eBytePos;
 
 static volatile uint8_t    *pucSndBufferCur;
@@ -402,7 +402,7 @@ prvucMBBIN2CHAR(uint8_t ucByte)
 
 
 static uint8_t
-prvucMBLRC(uint8_t *pucFrame, uint16_t usLen)
+prvucMBLRC(uint8_t *pucFrame, uint8_t usLen)
 {
     uint8_t         ucLRC = 0;  /* LRC char initialized */
 
