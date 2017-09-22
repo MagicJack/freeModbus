@@ -223,14 +223,10 @@ xMBRTUReceiveFSM(void)
     switch (eRcvState) {
         /* If we have received a character in the init state we have to
          * wait until the frame is finished.
-         */
-    case STATE_RX_INIT:
-        vMBPortTimersEnable();
-        break;
-
-        /* In the error state we wait until all characters in the
+         * Or In the error state we wait until all characters in the
          * damaged frame are transmitted.
          */
+    case STATE_RX_INIT:
     case STATE_RX_ERROR:
         vMBPortTimersEnable();
         break;
